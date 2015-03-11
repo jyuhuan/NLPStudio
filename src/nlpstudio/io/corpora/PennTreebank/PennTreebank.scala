@@ -1,11 +1,12 @@
-package io.corpora.PennTreebank
+package nlpstudio.io.corpora.PennTreebank
 
 import foundation.math.graph.{Node, Tree}
-import io.files.TextFile
+import nlpstudio.io.files.TextFile
+import nlpstudio.io.files.directory
 import nlpstudio.utilities.RegularExpressions
 
 import scala.collection.mutable.ArrayBuffer
-import io.corpora.PennTreebank.PennTreebankEntry
+import nlpstudio.io.corpora.PennTreebank.PennTreebankEntry
 
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 3/5/15.
@@ -51,7 +52,12 @@ object PennTreebank {
     PennTreebankEntry(Tree(curNode))
   }
 
-  def readTrees(path: String) = {
+  /**
+   * Reads all sentences from a *.mrg file.
+   * @param path A path to a *.mrg file.
+   * @return A collection of PennTreebankEntry, each representing a parsed sentence.
+   */
+  def loadFromSingleMrgFile(path: String): Traversable[PennTreebankEntry] = {
     val lines = TextFile.readLines(path)
     val groups = new ArrayBuffer[ArrayBuffer[String]]
     groups += new ArrayBuffer[String]()
@@ -68,5 +74,24 @@ object PennTreebank {
     }
 
     for (group ← groups.filter(g ⇒ g.length > 0)) yield parseSingleTreebankSentence(group)
+  }
+
+  /**
+   * Reads all *.mrg files from a section (e.g., wsj/01/).
+   * @param dir The path to the directory that contains *.mrg files.
+   * @return A collection of collection of parsed trees.
+   */
+  def loadSection(dir: String): Traversable[Traversable[PennTreebankEntry]] = {
+    val allFiles = directory.allFilesWithExtension(dir, "mrg")
+    for (mrgFile ← allFiles) yield loadFromSingleMrgFile(mrgFile.getAbsolutePath)
+  }
+
+  /**
+   * Reads all parsed WSJ sentences
+   * @param dirToWsj
+   * @return
+   */
+  def load(dirToWsj: String): Traversable[Traversable[Traversable[PennTreebankEntry]]] = {
+    for (subDir <- directory.allSubdirectories(dirToWsj)) yield loadSection(subDir.getAbsolutePath)
   }
 }

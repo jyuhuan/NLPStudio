@@ -1,4 +1,4 @@
-package io.files
+package nlpstudio.io.files
 
 import scala.io.Source
 
