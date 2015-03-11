@@ -10,9 +10,19 @@ import io.corpora.PennTreebank.PennTreebankEntry
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 3/5/15.
  */
+
+/**
+ * A reader for Penn Treebank 3
+ */
 object PennTreebank {
 
-  def parseSingleTreebankSentence(lines: Seq[String]) = {
+  /**
+   * Parse a bracket-syntax for one single sentence to a Penn Treebank entry object.
+   * @param lines the lines for the bracket-syntax. The syntax should be exactly the same as the mrg file.
+   *              More or less brackets on the outside will cause error!
+   * @return A Penn Treebank Entry.
+   */
+  def parseSingleTreebankSentence(lines: Seq[String]): PennTreebankEntry = {
     val all = lines mkString ""
 
     var processedString = RegularExpressions.leftParenthesis.replaceAllIn(all, " ( ")
@@ -38,7 +48,7 @@ object PennTreebank {
         else curNode.data = token
       }
     }
-    Tree(curNode)
+    PennTreebankEntry(Tree(curNode))
   }
 
   def readTrees(path: String) = {
@@ -57,6 +67,6 @@ object PennTreebank {
       }
     }
 
-    for (group ← groups.filter(g ⇒ g.length > 0)) yield PennTreebankEntry(parseSingleTreebankSentence(group))
+    for (group ← groups.filter(g ⇒ g.length > 0)) yield parseSingleTreebankSentence(group)
   }
 }
