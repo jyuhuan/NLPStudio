@@ -1,15 +1,16 @@
-package io.corporafiles
+package io.corpora.PennTreebank
 
+import foundation.math.graph.{Node, Tree}
 import io.files.TextFile
 import nlpstudio.utilities.RegularExpressions
-import foundation.math.graph.Node
 
 import scala.collection.mutable.ArrayBuffer
+import io.corpora.PennTreebank.PennTreebankEntry
 
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 3/5/15.
  */
-object PennTreebankFile {
+object PennTreebank {
 
   def parseSingleTreebankSentence(lines: Seq[String]) = {
     val all = lines mkString ""
@@ -21,9 +22,9 @@ object PennTreebankFile {
     val rawTokens = processedString.split(" ")
     val tokens = rawTokens.slice(2, rawTokens.length - 2)
 
-    var curNode = new Node("S", null, new ArrayBuffer[Node[String]]())
+    var curNode = new Node(tokens(0), null, new ArrayBuffer[Node[String]]())
 
-    for (token ← tokens) {
+    for (token ← tokens.slice(1, tokens.length)) {
       if (token == "(") {
         curNode = curNode --> ""
       }
@@ -37,7 +38,7 @@ object PennTreebankFile {
         else curNode.data = token
       }
     }
-    curNode
+    Tree(curNode)
   }
 
   def readTrees(path: String) = {
@@ -56,6 +57,6 @@ object PennTreebankFile {
       }
     }
 
-    for (group ← groups) yield parseSingleTreebankSentence(group)
+    for (group ← groups.filter(g ⇒ g.length > 0)) yield PennTreebankEntry(parseSingleTreebankSentence(group))
   }
 }

@@ -17,7 +17,7 @@ import scala.collection.mutable.ListBuffer
  *             Prepare the root with its children and descendants before passing in.
  * @tparam T The type of data. If your node is Node[T], then fill whatever T is here.
  */
-class Tree[T](root: Node[T]) {
+case class Tree[T](root: Node[T]) {
   /**
    * Traverse the sub-tree starting from a given node.
    * @param node The root of the sub-tree.
@@ -82,4 +82,6 @@ class Tree[T](root: Node[T]) {
 //  }
 
 //  def asGraph[TEdge](): Graph[T, TEdge]
+
+  override def toString() = root.toString()
 }

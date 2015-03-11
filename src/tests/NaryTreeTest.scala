@@ -44,7 +44,7 @@ object NaryTreeTest {
     //val allNodes = tree.traverse()
     //val allLeaves = tree.leaves()
 
-    tree.pathBetween(n4, n10)
+    //tree.pathBetween(n4, n10)
 
     val breakpoint = 1
   }
