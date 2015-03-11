@@ -3,6 +3,9 @@ package foundation.math.graph
 import scala.collection.mutable
 import foundation.sugar.OrderedCollection
 import foundation.sugar.OrderedCollectionClasses._
+import foundation.problems.search.{SearchNode, Searcher}
+
+import scala.collection.mutable.ListBuffer
 
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 3/9/15.
@@ -68,6 +71,15 @@ class Tree[T](root: Node[T]) {
    */
   def leavesOf(node: Node[T]): Iterable[Node[T]] = basicTraverse(node, n ⇒ n.isLeaf, true)
 
-//  def pathBetween(nodeA: Node[T], nodeB: Node[T])
+//  def pathBetween(startNode: Node[T], endNode: Node[T]) = {
+//    val genSuccessor = (n: SearchNode[Node[T], Int]) ⇒ {
+//      val result = mutable.ArrayBuffer[SearchNode[Node[T], Int]]()
+//      if (n.state.parent != null) result += SearchNode[Node[T], Int](n.state.parent, n, 1)
+//      result ++= n.state.children.map(treeNode ⇒ SearchNode[Node[T], Int](treeNode, n, 0))
+//    }
+//
+//    val result = Searcher.depthFirstSearch[Node[T], Int](startNode, x ⇒ x == endNode, genSuccessor, -1)
+//  }
+
 //  def asGraph[TEdge](): Graph[T, TEdge]
 }

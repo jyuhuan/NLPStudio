@@ -41,8 +41,11 @@ object NaryTreeTest {
     n10 --> l6
 
     val tree = new Tree(n1)
-    val allNodes = tree.traverse()
-    val allLeaves = tree.leaves()
+    //val allNodes = tree.traverse()
+    //val allLeaves = tree.leaves()
+
+    tree.pathBetween(n4, n10)
+
     val breakpoint = 1
   }
 }

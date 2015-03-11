@@ -26,33 +26,21 @@ case class Node[T](var data: T) {
 
   def isLeaf = children.isEmpty
 
-  def addChild(dataOfNewChild: T) = {
+  def addChild(dataOfNewChild: T): Node[T] = {
     val newChild = new Node[T](dataOfNewChild, this, new mutable.ListBuffer[Node[T]]())
-    children += newChild
-    newChild
+    this.addChild(newChild)
   }
 
   def -->(dataOfNewChild: T) = addChild(dataOfNewChild)
 
-  def addChild(newChild: Node[T]) = {
+  def addChild(newChild: Node[T]): Node[T] = {
     children += newChild
+    newChild.parent = this
     newChild
   }
 
   def -->(newChild: Node[T]) = addChild(newChild)
 
-  def addChildren(dataSeqofNewChildres: TraversableOnce[T]) = {
-    children ++= dataSeqofNewChildres.map(d ⇒ new Node[T](d, this, new mutable.ListBuffer[Node[T]]()))
-  }
 
-  def ==>(dataSeqofNewChildres: TraversableOnce[T]) = addChildren(dataSeqofNewChildres)
-
-  override def toString() = {
-    if (children.length == 0) {
-      data.toString
-    }
-    else {
-      data.toString + " => " + children.map(n ⇒ n.data).mkString(" ")
-    }
-  }
+  override def toString() = data.toString
 }
