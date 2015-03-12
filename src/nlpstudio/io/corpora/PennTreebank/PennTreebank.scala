@@ -1,4 +1,4 @@
-package nlpstudio.io.corpora.PennTreebank
+package nlpstudio.io.corpora.penntreebank
 
 import foundation.math.graph.{Node, Tree}
 import nlpstudio.io.files.TextFile
@@ -6,7 +6,6 @@ import nlpstudio.io.files.directory
 import nlpstudio.utilities.RegularExpressions
 
 import scala.collection.mutable.ArrayBuffer
-import nlpstudio.io.corpora.PennTreebank.PennTreebankEntry
 
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 3/5/15.
@@ -57,7 +56,7 @@ object PennTreebank {
    * @param path A path to a *.mrg file.
    * @return A collection of PennTreebankEntry, each representing a parsed sentence.
    */
-  def loadFromSingleMrgFile(path: String): Traversable[PennTreebankEntry] = {
+  def loadFromSingleMrgFile(path: String): Array[PennTreebankEntry] = {
     val lines = TextFile.readLines(path)
     val groups = new ArrayBuffer[ArrayBuffer[String]]
     groups += new ArrayBuffer[String]()
@@ -73,7 +72,7 @@ object PennTreebank {
       }
     }
 
-    for (group ← groups.filter(g ⇒ g.length > 0)) yield parseSingleTreebankSentence(group)
+    (for (group ← groups.filter(g ⇒ g.length > 0)) yield parseSingleTreebankSentence(group)).toArray
   }
 
   /**
@@ -81,17 +80,21 @@ object PennTreebank {
    * @param dir The path to the directory that contains *.mrg files.
    * @return A collection of collection of parsed trees.
    */
-  def loadSection(dir: String): Traversable[Traversable[PennTreebankEntry]] = {
+  def loadSection(dir: String): Array[Array[PennTreebankEntry]] = {
     val allFiles = directory.allFilesWithExtension(dir, "mrg")
-    for (mrgFile ← allFiles) yield loadFromSingleMrgFile(mrgFile.getAbsolutePath)
+    (for (mrgFile ← allFiles) yield loadFromSingleMrgFile(mrgFile.getAbsolutePath)).toArray
   }
 
+
   /**
-   * Reads all parsed WSJ sentences
-   * @param dirToWsj
-   * @return
+   * Reads all parse trees of WSJ.
+   * @param dirToWsj Path to the directory of WSJ (e.g., penn-tree-bank-3/parsed/wsj/)
+   * @return Suppose you store the return value is a variable, wsj,
+   *         accessing the second tree located in the mrg file 0103,
+   *         at section 01 is done by
+   *         wsj[01][03][1]
    */
-  def load(dirToWsj: String): Traversable[Traversable[Traversable[PennTreebankEntry]]] = {
-    for (subDir <- directory.allSubdirectories(dirToWsj)) yield loadSection(subDir.getAbsolutePath)
+  def load(dirToWsj: String): Array[Array[Array[PennTreebankEntry]]] = {
+    (for (subDir <- directory.allSubdirectories(dirToWsj)) yield loadSection(subDir.getAbsolutePath)).toArray
   }
 }

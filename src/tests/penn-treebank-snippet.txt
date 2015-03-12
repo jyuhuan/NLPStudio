@@ -1,0 +1,30 @@
+( (S
+    (NP-SBJ (NNP Cathryn) (NNP Rice) )
+    (VP (MD could)
+      (ADVP (RB hardly) )
+      (VP (VB believe)
+        (NP (PRP$ her) (NNS eyes) )))
+    (. .) ))
+( (S
+    (SBAR-TMP (IN While)
+      (S
+        (NP-SBJ (-NONE- *-1) )
+        (VP (VBG giving)
+          (NP
+            (NP (DT the) (JJ Comprehensive) (NN Test) )
+            (PP (IN of)
+              (NP (JJ Basic) (NNS Skills) )))
+          (PP-DTV (TO to)
+            (NP (JJ ninth) (NNS graders) ))
+          (PP-LOC (IN at)
+            (NP (NNP Greenville) (NNP High) (NNP School) ))
+          (NP-TMP (JJ last) (NNP March) (CD 16) ))))
+    (, ,)
+    (NP-SBJ-1 (PRP she) )
+    (VP (VBD spotted)
+      (NP
+        (NP (DT a) (NN student) )
+        (VP (VBG looking)
+          (PP-CLR (IN at)
+            (NP (JJ crib) (NNS sheets) )))))
+    (. .) ))

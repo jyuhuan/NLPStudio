@@ -1,7 +1,6 @@
 package nlpstudio.io.corpora.nombank
 
 import foundation.math.graph.Node
-import nlpstudio.io.corpora.nombank.NomBankEntry
 import nlpstudio.io.corpora.penntreebank.{PennTreebank, PennTreebankEntry}
 import nlpstudio.io.files.TextFile
 import nlpstudio.r
