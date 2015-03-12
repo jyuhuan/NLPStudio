@@ -1,5 +1,7 @@
 package foundation.math.graph
 
+import nlpstudio.utilities.UniqueNamer
+
 import scala.collection.mutable
 import foundation.sugar.OrderedCollection
 import foundation.sugar.OrderedCollectionClasses._
@@ -25,7 +27,7 @@ case class Tree[T](root: Node[T]) {
    * @param isDepthFirst If true, the resulting list of nodes will be in a depth-first ordering. Otherwise, breadth-first.
    * @return An iterable of all nodes that satisfy the condition to keep.
    */
-  private def basicTraverse(node: Node[T], conditionToKeep: Node[T] ⇒ Boolean, isDepthFirst: Boolean): Iterable[Node[T]] = {
+  private def basicTraverse(node: Node[T], conditionToKeep: Node[T] ⇒ Boolean, isDepthFirst: Boolean): Seq[Node[T]] = {
     val allNodes = mutable.ListBuffer[Node[T]]()
     val fringe: OrderedCollection[Node[T]] = if (isDepthFirst) mutable.Stack(node) else mutable.Queue(node)
     while (fringe.notEmpty()) {
@@ -62,14 +64,19 @@ case class Tree[T](root: Node[T]) {
    * Get all leaves of the tree in a depth-first order.
    * @return All leaves, from left to right.
    */
-  def leaves(): Iterable[Node[T]] = basicTraverse(root, n ⇒ n.isLeaf, true)
+  def leaves: Seq[Node[T]] = basicTraverse(root, n ⇒ n.isLeaf, true)
 
   /**
    * Get all leaves of a sub-tree starting from the given node in a depth-first order.
    * @param node The root of the sub-tree.
    * @return All leaves of the sub-tree, from left to right.
    */
-  def leavesOf(node: Node[T]): Iterable[Node[T]] = basicTraverse(node, n ⇒ n.isLeaf, true)
+  def leavesOf(node: Node[T]): Seq[Node[T]] = basicTraverse(node, n ⇒ n.isLeaf, true)
+
+  def internalNodes(): Seq[Node[T]] = basicTraverse(root, n ⇒ !n.isLeaf, true)
+
+  def internalNodesOf(node: Node[T]): Seq[Node[T]] = basicTraverse(node, n ⇒ !n.isLeaf, true)
+
 
 //  def pathBetween(startNode: Node[T], endNode: Node[T]) = {
 //    val genSuccessor = (n: SearchNode[Node[T], Int]) ⇒ {
@@ -81,7 +88,7 @@ case class Tree[T](root: Node[T]) {
 //    val result = Searcher.depthFirstSearch[Node[T], Int](startNode, x ⇒ x == endNode, genSuccessor, -1)
 //  }
 
-//  def asGraph[TEdge](): Graph[T, TEdge]
+
 
   override def toString() = root.toString()
 }
