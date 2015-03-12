@@ -16,4 +16,11 @@ import nlpstudio.io.corpora.penntreebank.PennTreebankEntry
  */
 case class NomBankAnnotationUnit(nodes: Seq[Node[String]], glueType: Int, labels: Seq[String])
 
+/**
+ * An entry of NomBank 1.0.
+ * @param predicate The predicate being annotated for.
+ * @param stemmedPredicate The stemmed form of the predicate.
+ * @param annotations Annotations for the predicate.
+ * @param parseTree The parse tree that these annotations annotate over.
+ */
 case class NomBankEntry(predicate: String, stemmedPredicate: String, annotations: Seq[NomBankAnnotationUnit], parseTree: PennTreebankEntry)
