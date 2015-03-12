@@ -11,6 +11,10 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 3/11/15.
  */
+
+/**
+ * A reader for NomBank 1.0
+ */
 object NomBank {
 
   private def parseAnnotations(tokenNodes: Seq[Node[String]], annotation: String) = {
