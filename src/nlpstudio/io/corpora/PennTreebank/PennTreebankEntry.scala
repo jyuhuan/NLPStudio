@@ -16,7 +16,7 @@ import scala.collection.mutable.ArrayBuffer
  * Each entry corresponds to one parse tree.
  * @param tree The parse tree.
  */
-case class PennTreebankEntry(tree: Tree[String]) {
+case class PennTreebankEntry(sectionId: Int, mrgFileId: Int, sentenceId: Int, tree: Tree[String]) {
 
   override def toString() = leaves.mkString(" ")
 

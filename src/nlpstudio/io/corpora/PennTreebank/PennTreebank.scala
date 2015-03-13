@@ -22,7 +22,7 @@ object PennTreebank {
    *              More or less brackets on the outside will cause error!
    * @return A Penn Treebank Entry.
    */
-  def parseSingleTreebankSentence(lines: Seq[String]): PennTreebankEntry = {
+  def parseSingleTreebankSentence(sectionId: Int, mrgFileId: Int, sentenceId: Int, lines: Seq[String]): PennTreebankEntry = {
     val all = lines mkString ""
 
     var processedString = RegularExpressions.leftParenthesis.replaceAllIn(all, " ( ")
@@ -48,7 +48,7 @@ object PennTreebank {
         else curNode.data = token
       }
     }
-    PennTreebankEntry(Tree(curNode))
+    PennTreebankEntry(sectionId, mrgFileId, sentenceId,Tree(curNode))
   }
 
   /**
@@ -57,6 +57,12 @@ object PennTreebank {
    * @return A collection of PennTreebankEntry, each representing a parsed sentence.
    */
   def loadFromSingleMrgFile(path: String): Array[PennTreebankEntry] = {
+    // obtain the section, mrg file, and sentence ids.
+    val lastPartOfPath = path.split('/').last // wsj_0016.mrg
+    val sectionId = lastPartOfPath.substring(4, 6).toInt
+    val mrgFileId = lastPartOfPath.substring(6, 8).toInt
+
+    // split tree by tree in this one single mrg file.
     val lines = TextFile.readLines(path)
     val groups = new ArrayBuffer[ArrayBuffer[String]]
     groups += new ArrayBuffer[String]()
@@ -72,7 +78,16 @@ object PennTreebank {
       }
     }
 
-    (for (group ← groups.filter(g ⇒ g.length > 0)) yield parseSingleTreebankSentence(group)).toArray
+    val parseTrees = ArrayBuffer[PennTreebankEntry]()
+    var sentenceIdCounter = 0
+    for (group ← groups) {
+      if (group.length > 0) {
+        parseTrees += parseSingleTreebankSentence(sectionId, mrgFileId, sentenceIdCounter, group)
+        sentenceIdCounter += 1
+      }
+    }
+    parseTrees.toArray
+    //(for (group ← groups.filter(g ⇒ g.length > 0)) yield parseSingleTreebankSentence(group)).toArray
   }
 
   /**
