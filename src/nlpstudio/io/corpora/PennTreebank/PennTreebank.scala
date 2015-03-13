@@ -12,7 +12,7 @@ import scala.collection.mutable.ArrayBuffer
  */
 
 /**
- * A reader for Penn Treebank 3
+ * A reader for Penn Treebank Third Version
  */
 object PennTreebank {
 
