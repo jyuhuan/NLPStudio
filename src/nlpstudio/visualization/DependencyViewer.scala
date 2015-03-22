@@ -32,7 +32,7 @@ object DependencyViewer {
     while (true) {
       println("Type your sentence here: ")
       val graph = new Graph[String, String]()
-      val text = scala.io.ReadStdin.readLine()
+      val text = scala.io.StdIn.readLine()
       val tokenizer = new DocumentPreprocessor(new StringReader(text))
       for (sentence ← tokenizer.asScala) {
         val tagged = tagger.tagSentence(sentence)

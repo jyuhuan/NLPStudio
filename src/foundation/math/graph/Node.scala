@@ -1,7 +1,9 @@
 package foundation.math.graph
 
-import scala.collection.mutable.ArrayBuffer
+import foundation.sugar.OrderedCollection
+
 import scala.collection.mutable
+
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 3/9/15.
  */
@@ -10,37 +12,45 @@ import scala.collection.mutable
  * @param data
  * @tparam T
  */
-case class Node[T](var data: T) {
+
+import foundation.sugar.OrderedCollection
+import foundation.sugar.OrderedCollectionClasses._
+
+trait Node[T] {
+  def parent: Node[T]
+  def children: Seq[Node[T]]
+  def isLeaf: Boolean
+
+
   /**
-   * The parent node.
-   * this is in this.parent.children
+   * Traverse the sub-tree starting from a given node.
+   * @param node The root of the sub-tree.
+   * @param conditionToKeep A condition for the traversal algorithm to decide whether to keep the node in the result list.
+   * @param isDepthFirst If true, the resulting list of nodes will be in a depth-first ordering. Otherwise, breadth-first.
+   * @return An iterable of all nodes that satisfy the condition to keep.
    */
-  var parent: Node[T] = null
-  var children: mutable.Buffer[Node[T]] = new mutable.ListBuffer[Node[T]]()
-
-  def this(data: T, parent: Node[T], children: mutable.Buffer[Node[T]]) {
-    this(data)
-    this.parent = parent
-    this.children = children
+  def traverse(childrenOf: Node[T] ⇒ Seq[Node[T]], conditionToKeep: Node[T] ⇒ Boolean, isDepthFirst: Boolean): Seq[Node[T]] = {
+    val allNodes = mutable.ListBuffer[Node[T]]()
+    val startNode = this
+    val fringe: OrderedCollection[Node[T]] = if (isDepthFirst) mutable.Stack(startNode) else mutable.Queue(startNode)
+    while (fringe.notEmpty()) {
+      val top = fringe.dequeue()
+      if (conditionToKeep(top)) allNodes += top
+      val successors = childrenOf(top)
+      fringe enqueueAll successors.reverse
+    }
+    allNodes
   }
 
-  def isLeaf = children.isEmpty
+  def traverse(isDepthFirst: Boolean = true): Iterable[Node[T]] = traverse(n ⇒ n.children, n ⇒ true, isDepthFirst)
 
-  def addChild(dataOfNewChild: T): Node[T] = {
-    val newChild = new Node[T](dataOfNewChild, this, new mutable.ListBuffer[Node[T]]())
-    this.addChild(newChild)
-  }
+  def leaves = traverse(n ⇒ n.children, n ⇒ n.isLeaf, isDepthFirst = true)
 
-  def -->(dataOfNewChild: T) = addChild(dataOfNewChild)
+  def internalNodes = traverse(n ⇒ n.children, n ⇒ !n.isLeaf, isDepthFirst = true)
 
-  def addChild(newChild: Node[T]): Node[T] = {
-    children += newChild
-    newChild.parent = this
-    newChild
-  }
-
-  def -->(newChild: Node[T]) = addChild(newChild)
-
-
-  override def toString() = data.toString
 }
+
+//object Node {
+//  def apply[T](data: T, parent: Node[T], children: Node[T]*) = new Node[T](data, parent, children: _*)
+//  def apply[T](data: T) = new Node[T](data)
+//}
