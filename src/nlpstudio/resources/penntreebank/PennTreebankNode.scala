@@ -2,7 +2,7 @@ package nlpstudio.resources.penntreebank
 
 
 import foundation.math.graph.Node
-import nlpstudio.resources.HeadFinders.CollinsHeadFinder
+import nlpstudio.resources.HeadFinders.{GerberSemanticHeadFinder, CollinsHeadFinder}
 import nlpstudio.resources.core.Rule
 
 
@@ -33,17 +33,20 @@ class PennTreebankNode private(var depth: Int,
 
   override def toString = data.toString
 
-//  override def toString = {
-//    if (isLeaf) data.toString
-//    data.toString + " => " + leaves.map(n ⇒ n.asInstanceOf[PennTreebankNode].data).mkString(" ")
-//  }
-
   var posTag: String = null
 
   def index = this.parentNode.children.indexOf(this)
 
   def syntacticCategory = if (posTag != null) posTag else this.data
+
+  /**
+   * Head constituent.
+   */
   def syntaxHead = CollinsHeadFinder(this)
+
+  /**
+   * Head word.
+   */
   def syntaxHeadWord = {
     if (isWord) this
     else {
@@ -56,17 +59,38 @@ class PennTreebankNode private(var depth: Int,
       cur
     }
   }
-  def semanticHead = ???
-  def firstWord = ???
-  def lastWord = ???
+
+  def semanticHead = GerberSemanticHeadFinder(this)
+
+  def firstWord = ??? //TODO: use tree traversal instead of getting all leaves
+
+  def lastWord = ??? //TODO: use tree traversal instead of getting all leaves
+
   def wordNodes = this.leaves.map(n ⇒ n.asInstanceOf[PennTreebankNode])
+
   def rule = Rule(this.syntacticCategory, this.childrenNodes.map(_.syntacticCategory))
+
   def isWord = this.isLeaf
+
   def firstPos = ???
+
   def lastPos = ???
+
   def isNullElement: Boolean = {
     if (isLeaf) syntacticCategory == SpecialCategories.nullElement
     else childrenNodes.forall(n ⇒ n.isNullElement)
+  }
+
+  def leftSiblings = {
+    val indexUnderParent = this.index
+    val allSiblings = this.parentNode.childrenNodes
+    allSiblings.slice(0, indexUnderParent)
+  }
+
+  def rightSiblings = {
+    val indexUnderParent = this.index
+    val allSiblings = this.parentNode.childrenNodes
+    allSiblings.slice(indexUnderParent + 1, allSiblings.length)
   }
 }
 
