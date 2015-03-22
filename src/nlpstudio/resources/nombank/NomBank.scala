@@ -59,7 +59,7 @@ object NomBank {
       val tokenId = tokenAndSteps(0).toInt
       val steps = tokenAndSteps(1).toInt
       var curNode = tokens(tokenId)
-      for (i ← 0 to steps) {
+      for (i ← 0 until steps) {
         curNode = curNode.parentNode
       }
       curNode

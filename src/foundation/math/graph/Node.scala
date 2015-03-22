@@ -29,24 +29,28 @@ trait Node[T] {
    * @param isDepthFirst If true, the resulting list of nodes will be in a depth-first ordering. Otherwise, breadth-first.
    * @return An iterable of all nodes that satisfy the condition to keep.
    */
-  def traverse(childrenOf: Node[T] ⇒ Seq[Node[T]], conditionToKeep: Node[T] ⇒ Boolean, isDepthFirst: Boolean): Seq[Node[T]] = {
+  def traverse(childrenOf: Node[T] ⇒ Seq[Node[T]], conditionToKeep: Node[T] ⇒ Boolean, action: Node[T] ⇒ Unit, isDepthFirst: Boolean): Seq[Node[T]] = {
     val allNodes = mutable.ListBuffer[Node[T]]()
     val startNode = this
     val fringe: OrderedCollection[Node[T]] = if (isDepthFirst) mutable.Stack(startNode) else mutable.Queue(startNode)
     while (fringe.notEmpty()) {
       val top = fringe.dequeue()
-      if (conditionToKeep(top)) allNodes += top
+      if (conditionToKeep(top)) {
+        allNodes += top
+        action(top)
+      }
       val successors = childrenOf(top)
       fringe enqueueAll successors.reverse
     }
     allNodes
   }
 
-  def traverse(isDepthFirst: Boolean = true): Iterable[Node[T]] = traverse(n ⇒ n.children, n ⇒ true, isDepthFirst)
+  def traverse(isDepthFirst: Boolean = true): Iterable[Node[T]] = traverse(n ⇒ n.children, n ⇒ true, n ⇒ Unit, isDepthFirst)
 
-  def leaves = traverse(n ⇒ n.children, n ⇒ n.isLeaf, isDepthFirst = true).toArray
+  def leaves = traverse(n ⇒ n.children, n ⇒ n.isLeaf, n ⇒ Unit, isDepthFirst = true).toArray
+  def leaves(action: Node[T] ⇒ Unit) = traverse(n ⇒ n.children, n ⇒ n.isLeaf, action, isDepthFirst = true).toArray
 
-  def internalNodes = traverse(n ⇒ n.children, n ⇒ !n.isLeaf, isDepthFirst = true)
+  def internalNodes = traverse(n ⇒ n.children, n ⇒ !n.isLeaf, n ⇒ Unit, isDepthFirst = true)
 
 }
 

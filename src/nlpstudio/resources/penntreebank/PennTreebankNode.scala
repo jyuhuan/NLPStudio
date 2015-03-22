@@ -28,11 +28,14 @@ class PennTreebankNode private(var depth: Int,
     this.childrenNodes += newNode
   }
 
-  override def toString = {
-    if (isLeaf) data.toString
-    data.toString + " => " + leaves.map(n ⇒ n.asInstanceOf[PennTreebankNode].data).mkString(" ")
-  }
+  override def toString = data.toString
 
+//  override def toString = {
+//    if (isLeaf) data.toString
+//    data.toString + " => " + leaves.map(n ⇒ n.asInstanceOf[PennTreebankNode].data).mkString(" ")
+//  }
+
+  var posTag: String = null
 
   def syntacticCategory = this.data
   def head = ???
@@ -42,12 +45,13 @@ class PennTreebankNode private(var depth: Int,
   def lastWord = ???
   def words = this.leaves
   def rule = Rule(this.syntacticCategory, this.childrenNodes.map(_.syntacticCategory))
-  def isPOS = this.children.exists(_.isLeaf)
   def isWord = this.children.length == 0
-  def isCategory = !(this.isPOS || this.isWord)
-  def firstPOS = ???
-  def lastPOS = ???
-  def POSes = this.traverse(n ⇒ n.children, n ⇒ n.children.exists(_.isLeaf), isDepthFirst = true)
+  def firstPos = ???
+  def lastPos = ???
+  def isNullElement: Boolean = {
+    if (isLeaf) syntacticCategory == SpecialCategories.nullElement
+    else childrenNodes.forall(n ⇒ n.isNullElement)
+  }
 }
 
 object PennTreebankNode {

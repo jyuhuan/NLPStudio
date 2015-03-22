@@ -58,7 +58,9 @@ object PennTreebank {
       }
       else {
         if (curNode.data.length > 0) {
-          curNode.childrenNodes += PennTreebankNode(curNode.depth + 1, token, Seq(""), curNode, null)
+          //curNode.childrenNodes += PennTreebankNode(curNode.depth + 1, token, Seq(""), curNode, null)
+          curNode.posTag = curNode.data
+          curNode.data = token
         }
         else {
           val newCatAndLabel = splitCategoryAndLabels(token)
@@ -67,7 +69,8 @@ object PennTreebank {
         }
       }
     }
-    //PennTreebankEntry(sectionId, mrgFileId, sentenceId,Tree(curNode))
+
+
 
     PennTreebankEntry(corpusName, sectionId, mrgFileId, sentenceId, curNode)
   }
