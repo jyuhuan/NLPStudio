@@ -2,11 +2,12 @@ package nlpstudio.resources.penntreebank
 
 
 import foundation.math.graph.Node
+import nlpstudio.resources.HeadFinders.CollinsHeadFinder
 import nlpstudio.resources.core.Rule
 
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ArrayBuffer}
 
 
 /**
@@ -16,7 +17,7 @@ class PennTreebankNode private(var depth: Int,
                                var data: String,
                                var labels: Seq[String],
                                var parentNode: PennTreebankNode,
-                               var childrenNodes: mutable.Buffer[PennTreebankNode]) extends Node[String] {
+                               var childrenNodes: mutable.ArrayBuffer[PennTreebankNode]) extends Node[String] {
 
   override def parent: Node[String] = parentNode
   override def children: Seq[Node[String]] = childrenNodes
@@ -28,6 +29,8 @@ class PennTreebankNode private(var depth: Int,
     this.childrenNodes += newNode
   }
 
+  def apply(idx: Int) = childrenNodes(idx)
+
   override def toString = data.toString
 
 //  override def toString = {
@@ -37,15 +40,28 @@ class PennTreebankNode private(var depth: Int,
 
   var posTag: String = null
 
-  def syntacticCategory = this.data
-  def head = ???
-  def headWord = ???
+  def index = this.parentNode.children.indexOf(this)
+
+  def syntacticCategory = if (posTag != null) posTag else this.data
+  def syntaxHead = CollinsHeadFinder(this)
+  def syntaxHeadWord = {
+    if (isWord) this
+    else {
+      var reachedTheBottom = false
+      var cur = this
+      while (!reachedTheBottom) {
+        cur = cur.syntaxHead
+        if (cur.isWord) reachedTheBottom = true
+      }
+      cur
+    }
+  }
   def semanticHead = ???
   def firstWord = ???
   def lastWord = ???
-  def words = this.leaves
+  def wordNodes = this.leaves.map(n ⇒ n.asInstanceOf[PennTreebankNode])
   def rule = Rule(this.syntacticCategory, this.childrenNodes.map(_.syntacticCategory))
-  def isWord = this.children.length == 0
+  def isWord = this.isLeaf
   def firstPos = ???
   def lastPos = ???
   def isNullElement: Boolean = {
@@ -59,10 +75,10 @@ object PennTreebankNode {
             data: String,
             labels: Seq[String],
             parent: PennTreebankNode,
-            children: mutable.Buffer[PennTreebankNode]) = {
+            children: mutable.ArrayBuffer[PennTreebankNode]) = {
 
     if (children == null) {
-      new PennTreebankNode(depth, data, labels, parent, new ListBuffer[PennTreebankNode])
+      new PennTreebankNode(depth, data, labels, parent, new ArrayBuffer[PennTreebankNode])
     }
     else {
       new PennTreebankNode(depth, data, labels, parent, children)

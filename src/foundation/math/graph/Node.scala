@@ -46,6 +46,7 @@ trait Node[T] {
   }
 
   def traverse(isDepthFirst: Boolean = true): Iterable[Node[T]] = traverse(n ⇒ n.children, n ⇒ true, n ⇒ Unit, isDepthFirst)
+  def traverse(action: Node[T] ⇒ Unit, isDepthFirst: Boolean): Iterable[Node[T]] = traverse(n ⇒ n.children, n ⇒ true, action, isDepthFirst)
 
   def leaves = traverse(n ⇒ n.children, n ⇒ n.isLeaf, n ⇒ Unit, isDepthFirst = true).toArray
   def leaves(action: Node[T] ⇒ Unit) = traverse(n ⇒ n.children, n ⇒ n.isLeaf, action, isDepthFirst = true).toArray

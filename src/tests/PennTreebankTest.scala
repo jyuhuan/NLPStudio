@@ -17,8 +17,7 @@ object PennTreebankTest extends App {
 
   val parseTree = ptb(0).root
 
-
-
+  //ptb.foreach(parse ⇒ parse.root.traverse(n ⇒ println(n.asInstanceOf[PennTreebankNode].head), isDepthFirst = true))
   val breakpoint = 0
 
 }
