@@ -28,7 +28,10 @@ class PennTreebankNode private(var depth: Int,
     this.childrenNodes += newNode
   }
 
-  override def toString = data.toString
+  override def toString = {
+    if (isLeaf) data.toString
+    data.toString + " => " + leaves.map(n ⇒ n.asInstanceOf[PennTreebankNode].data).mkString(" ")
+  }
 
 
   def syntacticCategory = this.data

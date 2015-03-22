@@ -44,7 +44,7 @@ trait Node[T] {
 
   def traverse(isDepthFirst: Boolean = true): Iterable[Node[T]] = traverse(n ⇒ n.children, n ⇒ true, isDepthFirst)
 
-  def leaves = traverse(n ⇒ n.children, n ⇒ n.isLeaf, isDepthFirst = true)
+  def leaves = traverse(n ⇒ n.children, n ⇒ n.isLeaf, isDepthFirst = true).toArray
 
   def internalNodes = traverse(n ⇒ n.children, n ⇒ !n.isLeaf, isDepthFirst = true)
 
