@@ -44,7 +44,7 @@ object NomBank {
     }
     else PointerType.Single
 
-    val tokens = parseTree.leaves
+    val tokens = parseTree.wordNodes
 
     val pointers = if (pointerType == PointerType.Coreference) {
       pointerStrings.split('*')
@@ -112,7 +112,7 @@ object NomBank {
 //      }
 //    }
 
-    NomBankEntry(sectionId, mrgFileId, treeId, parseTree.leaves(tokenId), predicateBaseForm, senseId, annotations, parseTree)
+    NomBankEntry(sectionId, mrgFileId, treeId, parseTree.wordNodes(tokenId), predicateBaseForm, senseId, annotations, parseTree)
   }
 
 
