@@ -12,7 +12,6 @@ object NomBankTest {
 
     val nb = NomBank.load(r.nom_bank, r.penn_treebank_wsj)
 
-
     val breakpoint = 0
   }
 }

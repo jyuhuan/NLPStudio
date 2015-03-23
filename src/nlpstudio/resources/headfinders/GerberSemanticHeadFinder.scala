@@ -1,4 +1,4 @@
-package nlpstudio.resources.HeadFinders
+package nlpstudio.resources.headfinders
 
 import nlpstudio.resources.penntreebank.PennTreebankNode
 

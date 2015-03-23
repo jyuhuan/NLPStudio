@@ -65,7 +65,7 @@ object PennTreebank {
         else {
           val newCatAndLabel = splitCategoryAndLabels(token)
           curNode.content = newCatAndLabel._1
-          curNode.labels = newCatAndLabel._2
+          curNode.functionalTags = newCatAndLabel._2
         }
       }
     }

@@ -1,7 +1,5 @@
 package foundation.math.graph
 
-import foundation.sugar.OrderedCollection
-
 import scala.collection.mutable
 
 /**
@@ -12,9 +10,6 @@ import scala.collection.mutable
  * @param data
  * @tparam T
  */
-
-import foundation.sugar.OrderedCollection
-import foundation.sugar.OrderedCollectionClasses._
 
 trait Node[T] {
   def data: T
@@ -38,15 +33,15 @@ trait Node[T] {
     val startNode = this
     val fringe = mutable.Stack(startNode)
     var finished = false
-    while (!finished && fringe.notEmpty()) {
-      val top = fringe.dequeue()
+    while (!finished && fringe.nonEmpty) {
+      val top = fringe.pop()
       if (conditionToKeep(top)) {
         allNodes += top
         action(top)
       }
       if (shouldStop(top)) finished = true
       val successors = childrenOf(top)
-      fringe enqueueAll successors.reverse
+      fringe pushAll successors.reverse
     }
     allNodes
   }

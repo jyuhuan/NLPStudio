@@ -2,7 +2,7 @@ package nlpstudio.resources.penntreebank
 
 
 import foundation.math.graph.Node
-import nlpstudio.resources.HeadFinders.{GerberSemanticHeadFinder, CollinsHeadFinder}
+import nlpstudio.resources.headfinders.{GerberSemanticHeadFinder, CollinsHeadFinder}
 import nlpstudio.resources.core.Rule
 
 
@@ -13,16 +13,29 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * Created by yuhuan on 3/17/15.
  */
+
+/**
+ * A node in a PennTreebank parse tree.
+ * @param depth Depth of the node in the tree. The root node's depth is 0.
+ * @param content This is either <ol><li> the syntactic category (without functional labels like "SBJ")
+ *                for internal nodes, or</li> <li> surface words for leave nodes. </li>
+ * @param functionalTags Functional tags. E.g., ["BNF", "SBJ", "LOC"], ...
+ * @param parentNode The parent PennTreebankNode. This is different from the
+ *                   `parent` property inherited from the trait
+ *                   [[foundation.math.graph.Node Node]]. The `parent` returns a `Node[String]`
+ *                   object, while `parentNode` is directly a PennTreebankNode object, saving the
+ *                   effort to do downward type casting.
+ * @param childrenNodes
+ */
 class PennTreebankNode private(var depth: Int,
                                var content: String,
-                               var labels: Seq[String],
+                               var functionalTags: Seq[String],
                                var parentNode: PennTreebankNode,
                                var childrenNodes: mutable.ArrayBuffer[PennTreebankNode]) extends Node[String] {
 
   override def data: String = content
   override def parent: Node[String] = parentNode
   override def children: Seq[Node[String]] = childrenNodes
-
   override def isLeaf: Boolean = childrenNodes.isEmpty
 
   def addChildren(newNode: PennTreebankNode) = {
