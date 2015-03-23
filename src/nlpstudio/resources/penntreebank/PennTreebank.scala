@@ -60,11 +60,11 @@ object PennTreebank {
         if (curNode.data.length > 0) {
           //curNode.childrenNodes += PennTreebankNode(curNode.depth + 1, token, Seq(""), curNode, null)
           curNode.posTag = curNode.data
-          curNode.data = token
+          curNode.content = token
         }
         else {
           val newCatAndLabel = splitCategoryAndLabels(token)
-          curNode.data = newCatAndLabel._1
+          curNode.content = newCatAndLabel._1
           curNode.labels = newCatAndLabel._2
         }
       }

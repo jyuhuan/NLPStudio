@@ -14,11 +14,12 @@ import scala.collection.mutable.{ArrayBuffer}
  * Created by yuhuan on 3/17/15.
  */
 class PennTreebankNode private(var depth: Int,
-                               var data: String,
+                               var content: String,
                                var labels: Seq[String],
                                var parentNode: PennTreebankNode,
                                var childrenNodes: mutable.ArrayBuffer[PennTreebankNode]) extends Node[String] {
 
+  override def data: String = content
   override def parent: Node[String] = parentNode
   override def children: Seq[Node[String]] = childrenNodes
 
@@ -37,7 +38,7 @@ class PennTreebankNode private(var depth: Int,
 
   def index = this.parentNode.children.indexOf(this)
 
-  def syntacticCategory = if (posTag != null) posTag else this.data
+  def syntacticCategory = if (posTag != null) posTag else this.content
 
   /**
    * Head constituent.
@@ -62,19 +63,22 @@ class PennTreebankNode private(var depth: Int,
 
   def semanticHead = GerberSemanticHeadFinder(this)
 
-  def firstWord = ??? //TODO: use tree traversal instead of getting all leaves
-
-  def lastWord = ??? //TODO: use tree traversal instead of getting all leaves
-
   def wordNodes = this.leaves.map(n ⇒ n.asInstanceOf[PennTreebankNode])
+  def words = this.leaves.map(n ⇒ n.data)
+
+  def firstWordNode = traverse(n ⇒ n.children, n ⇒ n.isLeaf, n ⇒ n.isLeaf, n ⇒ Unit).head.asInstanceOf[PennTreebankNode]
+  def firstWord = firstWordNode.content
+  def firstPos = firstWordNode.posTag
+
+  def lastWordNode = traverse(n ⇒ n.children.reverse, n ⇒ n.isLeaf, n ⇒ n.isLeaf, n ⇒ Unit).head.asInstanceOf[PennTreebankNode]
+  def lastWord = lastWordNode.content
+  def lastPos = lastWordNode.posTag
 
   def rule = Rule(this.syntacticCategory, this.childrenNodes.map(_.syntacticCategory))
 
   def isWord = this.isLeaf
 
-  def firstPos = ???
 
-  def lastPos = ???
 
   def isNullElement: Boolean = {
     if (isLeaf) syntacticCategory == SpecialCategories.nullElement
