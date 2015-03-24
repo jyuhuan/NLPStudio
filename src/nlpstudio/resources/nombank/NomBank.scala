@@ -141,4 +141,9 @@ object NomBank {
     entries.toArray
   }
 
+  def loadAsFineGrainedEntries(pathToNomBank: String, pathToPennTreebank: String): Array[NomBankFineGrainedEntry] = {
+    val coarseEntries = load(pathToNomBank, pathToPennTreebank)
+    coarseEntries.flatMap(entry ⇒ entry.annotations.map(a ⇒ NomBankFineGrainedEntry(entry.sectionId, entry.mrgFileId, entry.treeId, entry.predicateNode, entry.stemmedPredicate, entry.senseId, a, entry.parseTree)))
+  }
+
 }

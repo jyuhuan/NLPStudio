@@ -10,7 +10,7 @@ import nlpstudio.r
 object NomBankTest {
   def main(args: Array[String]) {
 
-    val nb = NomBank.load(r.nom_bank, r.penn_treebank_wsj)
+    val nb = NomBank.loadAsFineGrainedEntries(r.nom_bank, r.penn_treebank_wsj)
 
     val breakpoint = 0
   }
