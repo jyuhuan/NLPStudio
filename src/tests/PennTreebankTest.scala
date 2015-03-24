@@ -15,9 +15,12 @@ object PennTreebankTest extends App {
 
   val ptb = PennTreebank.parseMrgFile("wsj", 0, 6, lines)
 
-  val parseTree = ptb(0).tree.syntacticHead
-  ptb(0).tree(1)(1)(1)(1)(1)(1).semanticHead
+  val parseTree = ptb(0).tree
 
+  val node1 = parseTree(1)(1)(1)
+  val node2 = parseTree(0)(1)
+
+  val path = node1.pathTo(node2)
 
   val breakpoint = 0
 

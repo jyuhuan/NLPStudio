@@ -199,8 +199,6 @@ class PennTreebankNode private(var depth: Int,
       successors
     }
 
-    val sb = new StringBuilder()
-
     val result = Searcher.depthFirstSearch(this, (x: PennTreebankNode) ⇒ x == target, successorFunc, "0")
     result.map(r ⇒ r.action + r.state.syntacticCategory).mkString("").substring(1)
   }
