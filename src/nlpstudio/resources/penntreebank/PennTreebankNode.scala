@@ -2,7 +2,8 @@ package nlpstudio.resources.penntreebank
 
 
 import foundation.math.graph.Node
-import nlpstudio.resources.headfinders.{GerberSemanticHeadFinder, CollinsHeadFinder}
+import foundation.problems.search.{SearchNode, Searcher}
+import nlpstudio.tools.headfinders.{GerberSemanticHeadFinder, CollinsHeadFinder}
 import nlpstudio.resources.core.Rule
 
 
@@ -186,6 +187,22 @@ class PennTreebankNode private(var depth: Int,
     val allSiblings = this.parentNode.childrenNodes
     if (indexUnderParent <= allSiblings.length - 2 && indexUnderParent >= 0) allSiblings(indexUnderParent + 1)
     null
+  }
+
+  def pathTo(target: PennTreebankNode): String = {
+
+    def successorFunc(searchNode: SearchNode[PennTreebankNode, String]): Iterable[SearchNode[PennTreebankNode, String]] = {
+      val ptbNode = searchNode.state
+      val successors = ArrayBuffer[SearchNode[PennTreebankNode, String]]()
+      if (ptbNode.parentNode != null) successors += SearchNode(ptbNode.parentNode, searchNode, "↑")
+      ptbNode.childrenNodes.foreach(x ⇒ successors += SearchNode(x, searchNode, "↓"))
+      successors
+    }
+
+    val sb = new StringBuilder()
+
+    val result = Searcher.depthFirstSearch(this, (x: PennTreebankNode) ⇒ x == target, successorFunc, "0")
+    result.map(r ⇒ r.action + r.state.syntacticCategory).mkString("").substring(1)
   }
 }
 

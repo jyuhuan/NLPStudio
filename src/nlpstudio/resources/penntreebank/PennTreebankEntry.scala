@@ -10,7 +10,6 @@ class PennTreebankEntry private(var corpusName: String,
                         var tree: PennTreebankNode) {
 
   def wordNodes = tree.wordNodes
-
 }
 
 object PennTreebankEntry {
