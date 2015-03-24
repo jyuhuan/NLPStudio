@@ -68,6 +68,10 @@ object NomBank {
     val labelAndFunctionTags = tagStrings.split('-')
     val label = labelAndFunctionTags(0)
     val functionTags = labelAndFunctionTags.slice(1, labelAndFunctionTags.length)
+    if (affectedNodes(0) == null) {
+      println("found")
+      val bp = 0
+    }
     NomBankAnnotation(affectedNodes, pointerType, label, functionTags)
   }
 
@@ -143,7 +147,12 @@ object NomBank {
 
   def loadAsFineGrainedEntries(pathToNomBank: String, pathToPennTreebank: String): Array[NomBankFineGrainedEntry] = {
     val coarseEntries = load(pathToNomBank, pathToPennTreebank)
-    coarseEntries.flatMap(entry ⇒ entry.annotations.map(a ⇒ NomBankFineGrainedEntry(entry.sectionId, entry.mrgFileId, entry.treeId, entry.predicateNode, entry.stemmedPredicate, entry.senseId, a, entry.parseTree)))
+    coarseEntries.flatMap(e ⇒ e.annotations.flatMap(a ⇒ a.nodes.map(n ⇒ {
+      if (n == null) {
+        val bp = 0
+      }
+      NomBankFineGrainedEntry(e.sectionId, e.mrgFileId, e.treeId, e.predicateNode, e.stemmedPredicate, e.senseId, n, a.label, a.functionTags, e.parseTree)
+    })))
   }
 
 }

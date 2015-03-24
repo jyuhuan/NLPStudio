@@ -107,7 +107,7 @@ class PennTreebankNode private(var depth: Int,
       var cur = this
       while (!reachedTheBottom) {
         cur = cur.syntacticHead
-        if (cur.isWord) reachedTheBottom = true
+        if (cur == null || cur.isWord) reachedTheBottom = true
       }
       cur
     }
@@ -167,11 +167,11 @@ class PennTreebankNode private(var depth: Int,
   }
 
   /** The sibling node immediately to the left of this node */
-  def leftSibling = {
+  def leftSibling: PennTreebankNode = {
     val indexUnderParent = this.index
     val allSiblings = this.parentNode.childrenNodes
     if (indexUnderParent <= allSiblings.length - 1 && indexUnderParent >= 1) allSiblings(indexUnderParent - 1)
-    null
+    else null
   }
 
   /** All siblings to the right of this node */
@@ -182,11 +182,11 @@ class PennTreebankNode private(var depth: Int,
   }
 
   /** The sibling node immediately to the right of this node */
-  def rightSibling = {
+  def rightSibling: PennTreebankNode = {
     val indexUnderParent = this.index
     val allSiblings = this.parentNode.childrenNodes
     if (indexUnderParent <= allSiblings.length - 2 && indexUnderParent >= 0) allSiblings(indexUnderParent + 1)
-    null
+    else null
   }
 
   def pathTo(target: PennTreebankNode): String = {

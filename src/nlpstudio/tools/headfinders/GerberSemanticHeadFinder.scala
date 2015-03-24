@@ -19,9 +19,12 @@ object GerberSemanticHeadFinder extends HeadFinder {
     if (semanticHead != null && semanticHead.parent != null) {
       if (shiftRules contains semanticHead.syntacticCategory) {
         val dir = shiftRules(semanticHead.syntacticCategory)
-        val siblings = if (dir == FindDirection.LeftToRight) semanticHead.rightSiblings else semanticHead.leftSiblings.reverse
-        val siblingSemanticHead = siblings.find(n ⇒ !n.isNullElement && n.semanticHead != null).get.semanticHead
-        if (siblingSemanticHead != null) semanticHead = siblingSemanticHead
+        if ((dir == FindDirection.LeftToRight && semanticHead.rightSiblings.length > 0) ||
+            (dir == FindDirection.RightToLeft && semanticHead.leftSiblings.length > 0)) {
+          val siblings = if (dir == FindDirection.LeftToRight) semanticHead.rightSiblings else semanticHead.leftSiblings.reverse
+          val siblingSemanticHead = siblings.find(n ⇒ !n.isNullElement && n.semanticHead != null).get.semanticHead
+          if (siblingSemanticHead != null) semanticHead = siblingSemanticHead
+        }
       }
     }
     semanticHead

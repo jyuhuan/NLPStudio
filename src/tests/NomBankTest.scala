@@ -12,6 +12,8 @@ object NomBankTest {
 
     val nb = NomBank.loadAsFineGrainedEntries(r.nom_bank, r.penn_treebank_wsj)
 
+    val a = nb.map(n ⇒ n.candidateNode.semanticHead)
+
     val breakpoint = 0
   }
 }
