@@ -15,7 +15,7 @@ object GerberSemanticHeadFinder extends HeadFinder {
   )
 
   override def find(ptbNode: PennTreebankNode): PennTreebankNode = {
-    var semanticHead = ptbNode.syntaxHeadWord
+    var semanticHead = ptbNode.syntacticHeadWord
     if (semanticHead != null && semanticHead.parent != null) {
       if (shiftRules contains semanticHead.syntacticCategory) {
         val dir = shiftRules(semanticHead.syntacticCategory)
