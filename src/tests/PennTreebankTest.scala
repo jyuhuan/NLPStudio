@@ -1,6 +1,7 @@
 package tests
 
 import nlpstudio.io.files.TextFile
+import nlpstudio.r
 import nlpstudio.resources.penntreebank.{PennTreebankNode, PennTreebankEntry, PennTreebank}
 
 /**
@@ -9,18 +10,25 @@ import nlpstudio.resources.penntreebank.{PennTreebankNode, PennTreebankEntry, Pe
 
 object PennTreebankTest extends App {
 
-  val testMrgFile = "/Users/yuhuan/work/data/penn-tree-bank-3/parsed/mrg/wsj/00/wsj_0006.mrg"
+//  val testMrgFile = "/Users/yuhuan/work/data/penn-tree-bank-3/parsed/mrg/wsj/00/wsj_0006.mrg"
+//
+//  val lines = TextFile.readLines(testMrgFile)
+//
+//  val ptb = PennTreebank.parseMrgFile("wsj", 0, 6, lines)
+//
+//  val parseTree = ptb(0).tree
+//
+//  val node1 = parseTree(1)(1)(1)
+//  val node2 = parseTree(0)(1)
+//
+//  val path = node1.pathTo(node2)
+//
+//  val a = parseTree.wordNodes.filterNot(x => x.wordIndex == 0).map(x => x.prevWordNode)
 
-  val lines = TextFile.readLines(testMrgFile)
 
-  val ptb = PennTreebank.parseMrgFile("wsj", 0, 6, lines)
+  val ptb = PennTreebank.load(r.penn_treebank_wsj)
 
-  val parseTree = ptb(0).tree
-
-  val node1 = parseTree(1)(1)(1)
-  val node2 = parseTree(0)(1)
-
-  val path = node1.pathTo(node2)
+  val allTrees = ptb.flatMap(x => x.flatMap(y => y))
 
   val breakpoint = 0
 

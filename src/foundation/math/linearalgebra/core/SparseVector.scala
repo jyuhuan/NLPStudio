@@ -27,7 +27,8 @@ class SparseVector(var dimension: Int) {
     scalars
   }
 
-  override def toString = "[" + toDense.mkString(", ") + "]"
+  //override def toString = "[" + toDense.mkString(", ") + "]"
+  override def toString = this.data.map(p => p._1 + ":" + p._2).mkString(" ")
 }
 
 object SparseVector {
