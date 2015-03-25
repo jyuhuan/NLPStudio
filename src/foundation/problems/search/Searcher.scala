@@ -18,6 +18,10 @@ object Searcher {
     basicGraphSearch(startState, isGoal, generateSuccessors, defaultAction: TAction, new mutable.Stack[SearchNode[TState, TAction]]())
   }
 
+  def breadthFirstSearch[TState, TAction](startState: TState, isGoal: TState ⇒ Boolean, generateSuccessors: SearchNode[TState, TAction] ⇒ Iterable[SearchNode[TState, TAction]], defaultAction: TAction): Iterable[SearchNode[TState, TAction]] = {
+    basicGraphSearch(startState, isGoal, generateSuccessors, defaultAction: TAction, new mutable.Queue[SearchNode[TState, TAction]]())
+  }
+
   private def basicGraphSearch[TState, TAction](startState: TState, isGoal: TState ⇒ Boolean, generateSuccessors: SearchNode[TState, TAction] ⇒ Iterable[SearchNode[TState, TAction]], defaultAction: TAction, fringe: OrderedCollection[SearchNode[TState, TAction]]): Iterable[SearchNode[TState, TAction]] = {
     val startNode = SearchNode[TState, TAction](startState, null, defaultAction)
     fringe.enqueue(startNode)
