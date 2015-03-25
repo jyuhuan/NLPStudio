@@ -6,7 +6,7 @@ import nlpstudio.resources.penntreebank.PennTreebankNode
  */
 object NodeTest extends App {
 
-  val ptbNode = PennTreebankNode(0, "VP", Seq("BNF", "CRL"), null, null)
+  val ptbNode = PennTreebankNode(0, "VP", -1, -1, Seq("BNF", "CRL"), null, null)
 
 
 
