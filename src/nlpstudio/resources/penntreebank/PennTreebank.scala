@@ -56,6 +56,8 @@ object PennTreebank {
     val catAndLabel = splitCompoundSyntacticCategory(firstToken)
     var curNode = PennTreebankNode(0, catAndLabel._1, catAndLabel._2, catAndLabel._3, catAndLabel._4, null, null)
 
+    var tokenCounter = 0
+
     for (token ← tokens.slice(1, tokens.length)) {
       if (token == "(") {
         val newChild = PennTreebankNode(curNode.depth + 1, "", -1, -1, Seq[String](), curNode, null)
@@ -67,9 +69,11 @@ object PennTreebank {
       }
       else {
         if (curNode.data.length > 0) {
-          //curNode.childrenNodes += PennTreebankNode(curNode.depth + 1, token, Seq(""), curNode, null)
+          // a word node
           curNode.posTag = curNode.data
           curNode.content = token
+          curNode.wordIndex = tokenCounter
+          tokenCounter += 1
         }
         else {
           val newCatAndLabel = splitCompoundSyntacticCategory(token)

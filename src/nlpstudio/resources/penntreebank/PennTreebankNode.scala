@@ -3,8 +3,10 @@ package nlpstudio.resources.penntreebank
 
 import foundation.math.graph.Node
 import foundation.problems.search.{SearchNode, Searcher}
+import nlpstudio.exceptions.{NotAWordNodeException, NoMoreWordsException, LowestCommonAncestorNotExistsException}
 import nlpstudio.tools.headfinders.{NullElementHasNoHeadException, GerberSemanticHeadFinder, CollinsHeadFinder}
 import nlpstudio.resources.core.Rule
+import nlpstudio.tools.verbfinders.GerberPassiveVerbFinder
 
 
 import scala.collection.mutable
@@ -84,6 +86,8 @@ class PennTreebankNode private(var depth: Int,
 
   /** The part of speech tag of the node. Not `null` only if the node is a leave (which represents a word) */
   var posTag: String = null
+
+  var wordIndex: Int = -1
 
   /** The index of this node among all siblings. */
   def index: Int = {
@@ -222,6 +226,48 @@ class PennTreebankNode private(var depth: Int,
     if (indexUnderParent <= allSiblings.length - 2 && indexUnderParent >= 0) allSiblings(indexUnderParent + 1)
     else null
   }
+
+  def ancestors: Set[PennTreebankNode] = {
+    val result = ArrayBuffer[PennTreebankNode]()
+    var cur = this
+    var done = false
+    while (!done) {
+      cur = cur.parentNode
+      if (cur == null) done = true
+      else result += cur
+    }
+    result.toSet
+  }
+
+  def lowestCommonAncestor(other: PennTreebankNode): PennTreebankNode = {
+    val myAncestors = this.ancestors
+    val otherAncestors = other.ancestors
+    if (myAncestors.isEmpty || otherAncestors.isEmpty) {
+      throw new LowestCommonAncestorNotExistsException("one of the nodes is already the root")
+    }
+    val intersect = myAncestors intersect otherAncestors
+    intersect.maxBy(_.depth)
+  }
+
+
+  def root: PennTreebankNode = {
+    var cur = this
+    var done = false
+    while (!done) {
+      if (cur.parentNode == null) done = true
+      else cur = cur.parentNode
+    }
+    cur
+  }
+
+  def prevWordNode: PennTreebankNode = {
+    if (this.wordIndex == 0) throw new NoMoreWordsException("This word is already at the left end. No more previous word. ")
+    if (!this.isWord) throw new NotAWordNodeException("prevWord is only defined on word nodes. ")
+    root.wordNodes(this.wordIndex - 1)
+  }
+
+  def isPassive: Boolean = GerberPassiveVerbFinder.isPassive(this)
+
 
   def pathTo(target: PennTreebankNode): String = {
 
