@@ -19,11 +19,20 @@ object PennTreebank {
    * @param s A string in the form of "NP-SBJ-BNF"
    * @return A tuple. _1 is "NP". _2 is ["SBJ", "BNF"].
    */
-  private def splitCategoryAndLabels(s: String): (String, Array[String]) = {
-    if (s(0) == '-') (s, Array[String]())
+  def splitCompoundSyntacticCategory(s: String): (String, Int, Int, Array[String]) = {
+    if (s(0) == '-') return (s, -1, -1, Array[String]())
     else {
-      val parts = s.split('-')
-      (parts(0), parts.slice(1, parts.length))
+      var mapId: Int = -1
+      var withoutMapId: String = s
+      val equalSignIdx = s.indexOf('=')
+      if (equalSignIdx != -1) {
+        mapId = s(equalSignIdx + 1).toString.toInt
+        withoutMapId = s.substring(0, s.indexOf('=')) + s.substring(s.indexOf('=') + 2)
+      }
+      val parts = withoutMapId.split('-')
+      if ("0123456789" contains parts.last(0))
+        return (parts(0), parts.last.toInt, mapId, parts.slice(1, parts.length - 1))
+      else return (parts(0), -1, mapId, parts.slice(1, parts.length))
     }
   }
 
@@ -44,12 +53,12 @@ object PennTreebank {
     val tokens = rawTokens.slice(2, rawTokens.length - 2)
 
     val firstToken = tokens(0)
-    val catAndLabel = splitCategoryAndLabels(firstToken)
-    var curNode = PennTreebankNode(0, catAndLabel._1, catAndLabel._2, null, null)
+    val catAndLabel = splitCompoundSyntacticCategory(firstToken)
+    var curNode = PennTreebankNode(0, catAndLabel._1, catAndLabel._2, catAndLabel._3, catAndLabel._4, null, null)
 
     for (token ← tokens.slice(1, tokens.length)) {
       if (token == "(") {
-        val newChild = PennTreebankNode(curNode.depth + 1, "", Seq[String](), curNode, null)
+        val newChild = PennTreebankNode(curNode.depth + 1, "", -1, -1, Seq[String](), curNode, null)
         curNode.childrenNodes += newChild
         curNode = newChild
       }
@@ -63,9 +72,11 @@ object PennTreebank {
           curNode.content = token
         }
         else {
-          val newCatAndLabel = splitCategoryAndLabels(token)
+          val newCatAndLabel = splitCompoundSyntacticCategory(token)
           curNode.content = newCatAndLabel._1
-          curNode.functionalTags = newCatAndLabel._2
+          curNode.referenceId = newCatAndLabel._2
+          curNode.mapId = newCatAndLabel._3
+          curNode.functionalTags = newCatAndLabel._4
         }
       }
     }

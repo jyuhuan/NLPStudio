@@ -1,6 +1,7 @@
 package nlpstudio.tools.headfinders
 
 import nlpstudio.resources.penntreebank.PennTreebankNode
+import nlpstudio.tools.headfinders.NullElementHasNoHeadException
 
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 3/22/15.
@@ -30,7 +31,9 @@ object CollinsHeadFinder extends HeadFinder {
     "WHADJP" → (FindDirection.LeftToRight, Array("CC", "WRB", "JJ", "ADJP")),
     "WHADVP" → (FindDirection.RightToLeft, Array("CC", "WRB")),
     "WHNP" → (FindDirection.LeftToRight, Array("WDT", "WP", "WP$", "WHADJP", "WHPP", "WHNP")),
-    "WHPP" → (FindDirection.RightToLeft, Array("IN", "TO", "FW"))
+    "WHPP" → (FindDirection.RightToLeft, Array("IN", "TO", "FW")),
+    "NX" → (FindDirection.LeftToRight, Array[String]()),
+    "X" → (FindDirection.LeftToRight, Array[String]())
     )
 
 
@@ -56,7 +59,7 @@ object CollinsHeadFinder extends HeadFinder {
     val nonNullElement = node.childrenNodes.find(n ⇒ !n.isNullElement)
 
     // If there is no node that is not null, then there is no head.
-    if (nonNullElement == None) return null
+    if (nonNullElement == None) throw new NullElementHasNoHeadException("The children nodes are all null elements.")
     //else head = nonNullElement.get
 
     val childrenNodes = node.childrenNodes
@@ -79,7 +82,7 @@ object CollinsHeadFinder extends HeadFinder {
       if (head == null) head = findFirst(childrenNodes, Array("$", "ADJP", "PRN"), FindDirection.RightToLeft)
       if (head == null) head = findFirst(childrenNodes, Array("CD"), FindDirection.RightToLeft)
       if (head == null) head = findFirst(childrenNodes, Array("JJ", "JJS", "RB", "QP"), FindDirection.RightToLeft)
-      if (head == null) head = node.wordNodes.last
+      if (head == null) return node.wordNodes.last
     }
 
     // Not an NP. Try general rules
@@ -100,6 +103,17 @@ object CollinsHeadFinder extends HeadFinder {
 
     // If <constituent, CC, head>, then constituent should be the head.
     val nodeIndex = head.index
+
+    try {
+      if (nodeIndex >= 2 && node.childrenNodes(nodeIndex - 1).syntacticCategory == "CC")
+        head = node.childrenNodes(nodeIndex - 2)
+    }
+    catch {
+      case e: IndexOutOfBoundsException ⇒ {
+        val a = 0
+      }
+    }
+
     if (nodeIndex >= 2 && node.childrenNodes(nodeIndex - 1).syntacticCategory == "CC")
       head = node.childrenNodes(nodeIndex - 2)
     return head

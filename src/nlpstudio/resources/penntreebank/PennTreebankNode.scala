@@ -3,7 +3,7 @@ package nlpstudio.resources.penntreebank
 
 import foundation.math.graph.Node
 import foundation.problems.search.{SearchNode, Searcher}
-import nlpstudio.tools.headfinders.{GerberSemanticHeadFinder, CollinsHeadFinder}
+import nlpstudio.tools.headfinders.{NullElementHasNoHeadException, GerberSemanticHeadFinder, CollinsHeadFinder}
 import nlpstudio.resources.core.Rule
 
 
@@ -44,6 +44,8 @@ import scala.collection.mutable.ArrayBuffer
  */
 class PennTreebankNode private(var depth: Int,
                                var content: String,
+                               var referenceId: Int,
+                               var mapId: Int,
                                var functionalTags: Seq[String],
                                var parentNode: PennTreebankNode,
                                var childrenNodes: mutable.ArrayBuffer[PennTreebankNode]) extends Node[String] {
@@ -84,7 +86,10 @@ class PennTreebankNode private(var depth: Int,
   var posTag: String = null
 
   /** The index of this node among all siblings. */
-  def index = this.parentNode.children.indexOf(this)
+  def index: Int = {
+    if (this.parentNode == null) return -1
+    else return this.parentNode.children.indexOf(this)
+  }
 
   /** Returns the part of speech tag, if the node is a leave (which represents a word).
     * Otherwise, returns the syntactic category defined in ''Penn Treebank'' (e.g., `"NP"`, `"VP"`).
@@ -103,13 +108,18 @@ class PennTreebankNode private(var depth: Int,
   def syntacticHeadWord = {
     if (isWord) this
     else {
-      var reachedTheBottom = false
-      var cur = this
-      while (!reachedTheBottom) {
-        cur = cur.syntacticHead
-        if (cur == null || cur.isWord) reachedTheBottom = true
+      try {
+        var reachedTheBottom = false
+        var cur = this
+        while (!reachedTheBottom) {
+          cur = cur.syntacticHead
+          if (cur == null || cur.isWord) reachedTheBottom = true
+        }
+        cur
       }
-      cur
+      catch {
+        case e: NullElementHasNoHeadException ⇒ null
+      }
     }
   }
 
@@ -145,7 +155,10 @@ class PennTreebankNode private(var depth: Int,
   def lastPos = lastWordNode.posTag
 
   /** The context-free grammar rule that expanded the node */
-  def rule = Rule(this.syntacticCategory, this.childrenNodes.map(_.syntacticCategory))
+  def rule: Rule = {
+    if (this.parent == null) return null
+    Rule(this.parentNode.syntacticCategory, this.parentNode.childrenNodes.map(_.syntacticCategory))
+  }
 
   /** Whether the node is a word node. A word node is different from an internal node in that, the
     * `content` field has the surface word, and the `posTag` field has the part of speech tag.
@@ -160,8 +173,13 @@ class PennTreebankNode private(var depth: Int,
   }
 
   /** All siblings to the left of this node */
-  def leftSiblings = {
+  def leftSiblings: ArrayBuffer[PennTreebankNode] = {
     val indexUnderParent = this.index
+
+    // This node might already be the root:
+    if (this.parent == null) return ArrayBuffer[PennTreebankNode]()
+
+    // If the node is not the root:
     val allSiblings = this.parentNode.childrenNodes
     allSiblings.slice(0, indexUnderParent)
   }
@@ -169,21 +187,37 @@ class PennTreebankNode private(var depth: Int,
   /** The sibling node immediately to the left of this node */
   def leftSibling: PennTreebankNode = {
     val indexUnderParent = this.index
+
+    // This node might already be the root:
+    if (indexUnderParent == -1) return null
+
+    // If the node is not the root:
     val allSiblings = this.parentNode.childrenNodes
     if (indexUnderParent <= allSiblings.length - 1 && indexUnderParent >= 1) allSiblings(indexUnderParent - 1)
     else null
   }
 
   /** All siblings to the right of this node */
-  def rightSiblings = {
+  def rightSiblings: ArrayBuffer[PennTreebankNode] = {
     val indexUnderParent = this.index
+
+    // This node might already be the root:
+    if (this.parent == null) return ArrayBuffer[PennTreebankNode]()
+
+    // If the node is not the root:
     val allSiblings = this.parentNode.childrenNodes
     allSiblings.slice(indexUnderParent + 1, allSiblings.length)
   }
 
   /** The sibling node immediately to the right of this node */
   def rightSibling: PennTreebankNode = {
+
     val indexUnderParent = this.index
+
+    // This node might already be the root:
+    if (indexUnderParent == -1) return null
+
+    // If the node is not the root:
     val allSiblings = this.parentNode.childrenNodes
     if (indexUnderParent <= allSiblings.length - 2 && indexUnderParent >= 0) allSiblings(indexUnderParent + 1)
     else null
@@ -236,15 +270,17 @@ object PennTreebankNode {
    */
   def apply(depth: Int,
             content: String,
+            referenceId: Int,
+            mapId: Int,
             functionalTags: Seq[String],
             parentNode: PennTreebankNode,
             childrenNodes: mutable.ArrayBuffer[PennTreebankNode]) = {
 
     if (childrenNodes == null) {
-      new PennTreebankNode(depth, content, functionalTags, parentNode, new ArrayBuffer[PennTreebankNode])
+      new PennTreebankNode(depth, content, referenceId, mapId, functionalTags, parentNode, new ArrayBuffer[PennTreebankNode])
     }
     else {
-      new PennTreebankNode(depth, content, functionalTags, parentNode, childrenNodes)
+      new PennTreebankNode(depth, content, referenceId, mapId, functionalTags, parentNode, childrenNodes)
     }
 
   }

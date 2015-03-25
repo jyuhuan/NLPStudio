@@ -15,18 +15,30 @@ object GerberSemanticHeadFinder extends HeadFinder {
   )
 
   override def find(ptbNode: PennTreebankNode): PennTreebankNode = {
-    var semanticHead = ptbNode.syntacticHeadWord
-    if (semanticHead != null && semanticHead.parent != null) {
-      if (shiftRules contains semanticHead.syntacticCategory) {
-        val dir = shiftRules(semanticHead.syntacticCategory)
-        if ((dir == FindDirection.LeftToRight && semanticHead.rightSiblings.length > 0) ||
+    try {
+      var semanticHead = ptbNode.syntacticHeadWord
+      if (semanticHead != null && semanticHead.parent != null) {
+        if (shiftRules contains semanticHead.syntacticCategory) {
+          val dir = shiftRules(semanticHead.syntacticCategory)
+          if ((dir == FindDirection.LeftToRight && semanticHead.rightSiblings.length > 0) ||
             (dir == FindDirection.RightToLeft && semanticHead.leftSiblings.length > 0)) {
-          val siblings = if (dir == FindDirection.LeftToRight) semanticHead.rightSiblings else semanticHead.leftSiblings.reverse
-          val siblingSemanticHead = siblings.find(n ⇒ !n.isNullElement && n.semanticHead != null).get.semanticHead
-          if (siblingSemanticHead != null) semanticHead = siblingSemanticHead
+            val siblings = if (dir == FindDirection.LeftToRight) semanticHead.rightSiblings else semanticHead.leftSiblings.reverse
+
+            try {
+              semanticHead = siblings.find(n ⇒ !n.isNullElement && n.semanticHead != null).get.semanticHead
+            }
+            catch {
+              case e: NoSuchElementException ⇒ {
+
+              }
+            }
+          }
         }
       }
+      semanticHead
     }
-    semanticHead
+    catch {
+      case e: NullElementHasNoHeadException ⇒ { null }
+    }
   }
 }
