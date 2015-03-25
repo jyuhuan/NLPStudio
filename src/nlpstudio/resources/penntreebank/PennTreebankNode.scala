@@ -130,6 +130,8 @@ class PennTreebankNode private(var depth: Int,
   /** The semantic head of the node. Goes all the way to a word node. Reference: (Gerber, 2011) */
   def semanticHead = GerberSemanticHeadFinder(this)
 
+  //def objectHead
+
   /** All leave nodes subsumed by this node.
     * Different from the inherited `leaves` method in that this method returns an iterable of
     * [[nlpstudio.resources.penntreebank.PennTreebankNode PennTreebankNode]]'s, while the `leaves`
@@ -269,7 +271,7 @@ class PennTreebankNode private(var depth: Int,
   def isPassive: Boolean = GerberPassiveVerbFinder.isPassive(this)
 
 
-  def pathTo(target: PennTreebankNode): String = {
+  def pathTo(isGoal: PennTreebankNode => Boolean): String = {
 
     def successorFunc(searchNode: SearchNode[PennTreebankNode, String]): Iterable[SearchNode[PennTreebankNode, String]] = {
       val ptbNode = searchNode.state
@@ -279,7 +281,8 @@ class PennTreebankNode private(var depth: Int,
       successors
     }
 
-    val result = Searcher.depthFirstSearch(this, (x: PennTreebankNode) ⇒ x == target, successorFunc, "0")
+    val result = Searcher.breadthFirstSearch(this, isGoal, successorFunc, "0")
+    if (result.size <= 1) return ""
     result.map(r ⇒ r.action + r.state.syntacticCategory).mkString("").substring(1)
   }
 }
