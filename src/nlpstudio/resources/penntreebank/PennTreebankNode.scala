@@ -229,6 +229,10 @@ class PennTreebankNode private(var depth: Int,
     else null
   }
 
+  def rightRightMost(isGoal: PennTreebankNode ⇒ Boolean) = {
+    
+  }
+
   def ancestors: Set[PennTreebankNode] = {
     val result = ArrayBuffer[PennTreebankNode]()
     var cur = this
@@ -268,6 +272,12 @@ class PennTreebankNode private(var depth: Int,
     root.wordNodes(this.wordIndex - 1)
   }
 
+  def isBefore(that: PennTreebankNode): Boolean = {
+    val thisFirstWordNodeIdx = this.firstWordNode.wordIndex
+    val thatFirstWordNodeIdx = that.firstWordNode.wordIndex
+    thisFirstWordNodeIdx < thatFirstWordNodeIdx
+  }
+
   def isPassive: Boolean = GerberPassiveVerbFinder.isPassive(this)
 
 
@@ -282,7 +292,7 @@ class PennTreebankNode private(var depth: Int,
     }
 
     val result = Searcher.breadthFirstSearch(this, isGoal, successorFunc, "0")
-    if (result.size <= 1) return ""
+    if (result.size <= 1) return null
     result.map(r ⇒ r.action + r.state.syntacticCategory).mkString("").substring(1)
   }
 }

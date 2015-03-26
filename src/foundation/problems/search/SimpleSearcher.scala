@@ -15,21 +15,21 @@ case class SimpleSearchNode[S](state: S, parent: SimpleSearchNode[S])
 object SimpleSearcher {
 
   def depthFirstSearch[S](startState: S,
-                               isGoal: S ⇒ Boolean,
-                               generateSuccessors: S ⇒ Iterable[S]): S = {
+                          isGoal: S ⇒ Boolean,
+                          generateSuccessors: S ⇒ Iterable[S]): S = {
     basicGraphSearch(startState, isGoal, generateSuccessors, new mutable.Stack[SimpleSearchNode[S]]())
   }
 
   def breadthFirstSearch[S](startState: S,
-                                 isGoal: S ⇒ Boolean,
-                                 generateSuccessors: S ⇒ Iterable[S]): S = {
+                            isGoal: S ⇒ Boolean,
+                            generateSuccessors: S ⇒ Iterable[S]): S = {
     basicGraphSearch(startState, isGoal, generateSuccessors, new mutable.Queue[SimpleSearchNode[S]]())
   }
 
   private def basicGraphSearch[S](startState: S,
-                                       isGoal: S ⇒ Boolean,
-                                       generateSuccessors: S ⇒ Iterable[S],
-                                       fringe: OrderedCollection[SimpleSearchNode[S]]): S = {
+                                  isGoal: S ⇒ Boolean,
+                                  generateSuccessors: S ⇒ Iterable[S],
+                                  fringe: OrderedCollection[SimpleSearchNode[S]]): S = {
     val startNode = SimpleSearchNode[S](startState, null)
     fringe.enqueue(startNode)
     val explored = mutable.HashSet[S]()
