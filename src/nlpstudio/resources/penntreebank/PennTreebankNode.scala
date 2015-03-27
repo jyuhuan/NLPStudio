@@ -75,6 +75,10 @@ class PennTreebankNode private(var depth: Int,
     newNode
   }
 
+  def allNodes = {
+    this.traverse().map(x ⇒ x.asInstanceOf[PennTreebankNode])
+  }
+
   /**
    * Gets the child [[nlpstudio.resources.penntreebank.PennTreebankNode PennTreebankNode]] at a given index.
    * @param idx The index of the child.
@@ -279,9 +283,56 @@ class PennTreebankNode private(var depth: Int,
   }
 
   def prevWordNode: PennTreebankNode = {
-    if (this.wordIndex == 0) throw new NoMoreWordsException("This word is already at the left end. No more previous word. ")
-    if (!this.isWord) throw new NotAWordNodeException("prevWord is only defined on word nodes. ")
-    root.wordNodes(this.wordIndex - 1)
+    val firstIdx = this.firstWordNode.wordIndex
+    if (firstIdx == 0) return null //throw new NoMoreWordsException("This word is already at the left end. No more previous word. ")
+    //if (!this.isWord) throw new NotAWordNodeException("prevWord is only defined on word nodes. ")
+    root.wordNodes(firstIdx - 1)
+  }
+
+  def nextWordNode: PennTreebankNode = {
+    val lastIdx = this.lastWordNode.wordIndex
+    val all = root.wordNodes
+    if (lastIdx == all.length - 1) return null //throw new NoMoreWordsException("This word is already at the right end. No more next word. ")
+    //if (!this.isWord) throw new NotAWordNodeException("nextWord is only defined on word nodes. ")
+    all(lastIdx + 1)
+  }
+
+  def isRightAdjacentTo(condition: PennTreebankNode ⇒ Boolean): PennTreebankNode = {
+    val nextWordNodeOfThisNode = this.nextWordNode
+    if (nextWordNodeOfThisNode == null) return null
+    // go up
+    var cur = nextWordNodeOfThisNode
+    var done = false
+    while (!done) {
+      if (condition(cur) && cur.firstWordNode == nextWordNodeOfThisNode) {
+        done = true
+        return cur
+      }
+      if (cur.parentNode == null) {
+        done = true
+      }
+      cur = cur.parentNode
+    }
+    null // no adjacent node that meets the condition is found
+  }
+
+  def isLeftAdjacentTo(condition: PennTreebankNode ⇒ Boolean): PennTreebankNode = {
+    val prevWordNodeOfThisNode = this.prevWordNode
+    if (prevWordNodeOfThisNode == null) return null
+    // go up
+    var cur = prevWordNodeOfThisNode
+    var done = false
+    while (!done) {
+      if (condition(cur) && cur.lastWordNode == prevWordNodeOfThisNode) {
+        done = true
+        return cur
+      }
+      if (cur.parentNode == null) {
+        done = true
+      }
+      cur = cur.parentNode
+    }
+    null // no adjacent node that meets the condition is found
   }
 
   def isBefore(that: PennTreebankNode): Boolean = {
