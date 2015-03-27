@@ -147,12 +147,12 @@ object NomBank {
 
   def loadAsFineGrainedEntries(pathToNomBank: String, pathToPennTreebank: String): Array[NomBankFineGrainedEntry] = {
     val coarseEntries = load(pathToNomBank, pathToPennTreebank)
-    coarseEntries.flatMap(e ⇒ e.annotations.flatMap(a ⇒ a.nodes.map(n ⇒ {
-      if (n == null) {
-        val bp = 0
-      }
-      NomBankFineGrainedEntry(e.sectionId, e.mrgFileId, e.treeId, e.predicateNode, e.stemmedPredicate, e.senseId, n, a.label, a.functionTags, e.parseTree)
-    })))
+    coarseEntries.flatMap(e ⇒ {
+      val supportVerbNodes = ArrayBuffer[PennTreebankNode]()
+      supportVerbNodes ++= e.annotations.filter(a ⇒ a.label == "Support").map(a ⇒ a.nodes.head)
+      e.annotations.flatMap(a ⇒ a.nodes.map(n ⇒ {
+        NomBankFineGrainedEntry(e.sectionId, e.mrgFileId, e.treeId, e.predicateNode, e.stemmedPredicate, e.senseId, n, supportVerbNodes, a.label, a.functionTags, e.parseTree)
+      }))})
   }
 
 }

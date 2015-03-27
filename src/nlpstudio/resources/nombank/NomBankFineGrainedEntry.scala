@@ -21,6 +21,7 @@ import nlpstudio.resources.penntreebank.{PennTreebankEntry, PennTreebankNode}
  * @param stemmedPredicate
  * @param senseId
  * @param candidateNode
+ * @param supportVerbNodes
  * @param label
  * @param functionTags
  * @param parseTree
@@ -32,6 +33,7 @@ case class NomBankFineGrainedEntry(sectionId: Int,
                                    stemmedPredicate: String,
                                    senseId: Int,
                                    candidateNode: PennTreebankNode,
+                                   supportVerbNodes: Seq[PennTreebankNode],
                                    label: String,
                                    functionTags: Seq[String],
                                    parseTree: PennTreebankEntry)
