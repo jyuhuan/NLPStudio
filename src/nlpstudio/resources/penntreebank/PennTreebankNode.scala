@@ -1,8 +1,9 @@
 package nlpstudio.resources.penntreebank
 
 
+import foundation.exceptions.GoalNotFoundException
 import foundation.math.graph.Node
-import foundation.problems.search.{SearchNode, Searcher}
+import foundation.problems.search.{SimpleSearcher, SearchNode, Searcher}
 import nlpstudio.exceptions.{NotAWordNodeException, NoMoreWordsException, LowestCommonAncestorNotExistsException}
 import nlpstudio.tools.headfinders.{NullElementHasNoHeadException, GerberSemanticHeadFinder, CollinsHeadFinder}
 import nlpstudio.resources.core.Rule
@@ -229,8 +230,18 @@ class PennTreebankNode private(var depth: Int,
     else null
   }
 
-  def rightRightMost(isGoal: PennTreebankNode ⇒ Boolean) = {
-    
+  def rightMost(isGoal: PennTreebankNode ⇒ Boolean): PennTreebankNode = {
+    def succ(n: PennTreebankNode): Iterable[PennTreebankNode] = {
+      val successors = ArrayBuffer[PennTreebankNode]()
+      successors ++= n.childrenNodes
+      successors
+    }
+    try {
+      SimpleSearcher.depthFirstSearch(this, isGoal, succ)
+    }
+    catch {
+      case e: GoalNotFoundException ⇒ null
+    }
   }
 
   def ancestors: Set[PennTreebankNode] = {
@@ -248,11 +259,12 @@ class PennTreebankNode private(var depth: Int,
   def lowestCommonAncestor(other: PennTreebankNode): PennTreebankNode = {
     val myAncestors = this.ancestors
     val otherAncestors = other.ancestors
-    if (myAncestors.isEmpty || otherAncestors.isEmpty) {
-      throw new LowestCommonAncestorNotExistsException("one of the nodes is already the root")
+    if (myAncestors.isEmpty) return this
+    else if (myAncestors.isEmpty) return other
+    else {
+      val intersect = myAncestors intersect otherAncestors
+      intersect.maxBy(_.depth)
     }
-    val intersect = myAncestors intersect otherAncestors
-    intersect.maxBy(_.depth)
   }
 
 
