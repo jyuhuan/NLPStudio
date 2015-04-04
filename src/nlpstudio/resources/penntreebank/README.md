@@ -35,9 +35,9 @@ A `PennTreebankNode` represents a node in the PTB parse tree. There are two type
 	
 	*	A **co-index** pointing to the constituent marked with the same co-index. The whole idea of co-indexing is used for constituent movements. Three major cause of movements are **<i>wh-</i> questions**, **topicalization**, and **passive voices**. Examples are shown below: 
 	
-	<center>
+	<p align="center">
 		<img src="http://yuhuan.me/articles/img/ptb-explained/wh-movement.png" width="350" />
-		<p> <b>Figure 3</b>: 
+		<p align="center"> <b>Figure 3</b>: 
 			*Wh-* movement. 
 		</p>
 	</center>
