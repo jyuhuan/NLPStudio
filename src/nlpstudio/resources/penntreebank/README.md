@@ -17,39 +17,24 @@ A `PennTreebankNode` represents a node in the PTB parse tree. There are two type
 		In the original PTB annotation, a co-index is connected to a constituent's syntactic category with a hyphen: `NP-SBJ-2`. 
 	*	A **gap-mapping index**, which marks a constituent when it should be mapped to another constituent due to gapping. An example is shown below:
 	
-	<center>
-		<img src="http://yuhuan.me/articles/img/ptb-explained/gap-mapping.png" width="600" />
-	</center>
-	<p> <b>Figure 1</b>: 
-		A mapping of gappping. the <code>NP</code> for <i>Bill</i> maps to the  the <code>NP</code> for <i>Mary</i>, and the <code>NP</code> for <i>a pencil</i> maps to the <code>NP</code> for <i>a book</i>.
-	</p>
+	<center><img src="http://yuhuan.me/articles/img/ptb-explained/gap-mapping.png" width="600" /></center>
+	<center> **Figure 1**: A mapping of gappping. the `NP` for *Bill* maps to the  the `NP` for *Mary*, and the `NP` for *a pencil* maps to the `NP` for *a book*. </center>
 
 2.	A **word node** represents a word in the parse tree. Notice that PTB comes with two versions of trees. One is without the part-of-speech (POS) tags. The other has POS tags one level right above the words. The difference is shown in the following figure.
 	
-	<center><img src="http://yuhuan.me/articles/img/ptb-explained/pos-vs-no-pos.png" width="500" /></center>
-	<p> <b>Figure 2</b>: 
-		Two types of tree annotations found in <i>PennTreebank</i>.  One with part-of-speech labels (right), the other without them (left).
-	</p>
+	<img src="http://yuhuan.me/articles/img/ptb-explained/pos-vs-no-pos.png" width="500" /></center>
+	
+	**Figure 2**: Two types of tree annotations found in *PennTreebank*.  One with part-of-speech labels (right), the other without them (left).
 	
 	This library uses the latter type. Thus a word node contains both the word itself and the POS tag. Besides theses, a word node may also contain: 
 	
 	*	A **co-index** pointing to the constituent marked with the same co-index. The whole idea of co-indexing is used for constituent movements. Three major cause of movements are **<i>wh-</i> questions**, **topicalization**, and **passive voices**. Examples are shown below: 
 	
-	<p align="center">
-		<img src="http://yuhuan.me/articles/img/ptb-explained/wh-movement.png" width="350" />
-		<p align="center"> <b>Figure 3</b>: 
-			*Wh-* movement. 
-		</p>
-	</center>
+	<center><img src="http://yuhuan.me/articles/img/ptb-explained/wh-movement.png" width="350" /></center>
+	<center> **Figure 3**: *Wh-* movement. </center>
 	
-	
-	<center>
-		<img src="http://yuhuan.me/articles/img/ptb-explained/topicalization.png" width="500" />
-		<p> <b>Figure 4</b>: 
-			Topicalization. 
-		</p>
-	</center>
-	
+	<center><img src="http://yuhuan.me/articles/img/ptb-explained/topicalization.png" width="500" /></center>
+	<center> **Figure 4**: Topicalization. </center>
 
 
 Use `isLeaf` to check whether the node is an internal node (i.e., a non-terminal like `NP`, `S`, `ADJP`, etc.) or a leaf node (a word, or a terminal, like `NNP/John`, `JJ/good`, etc.) For any node (either internal or leaf), the following fields are meaningful:
@@ -68,5 +53,8 @@ The following fields are only meaningful to leaf nodes.
 
 *	`wordIndex`: The index of the word in the sentence, starting form 0.
 * 	(to be finished...)
+
+
+
 
 Currently, the PTB module in this project is tested with the wsj part. 
