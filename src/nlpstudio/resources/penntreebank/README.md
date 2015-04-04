@@ -17,7 +17,7 @@ A `PennTreebankNode` represents a node in the PTB parse tree. There are two type
 		In the original PTB annotation, a co-index is connected to a constituent's syntactic category with a hyphen: `NP-SBJ-2`. 
 	*	A **gap-mapping index**, which marks a constituent when it should be mapped to another constituent due to gapping. An example is shown below:
 	
-	<img src="http://yuhuan.me/articles/img/ptb-explained/gap-mapping.png" width="600" />
+	<img align="center" src="http://yuhuan.me/articles/img/ptb-explained/gap-mapping.png" width="600" />
 	
 	**Figure 1**: A mapping of gappping. the `NP` for *Bill* maps to the  the `NP` for *Mary*, and the `NP` for *a pencil* maps to the `NP` for *a book*.
 
