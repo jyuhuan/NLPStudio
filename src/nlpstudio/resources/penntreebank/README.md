@@ -23,7 +23,7 @@ A `PennTreebankNode` represents a node in the PTB parse tree. There are two type
 
 2.	A **word node** represents a word in the parse tree. Notice that PTB comes with two versions of trees. One is without the part-of-speech (POS) tags. The other has POS tags one level right above the words. The difference is shown in the following figure.
 	
-	<img src="http://yuhuan.me/articles/img/ptb-explained/pos-vs-no-pos.png" width="500" /></center>
+	<img src="http://yuhuan.me/articles/img/ptb-explained/pos-vs-no-pos.png" width="600" /></center>
 	
 	**Figure 2**: Two types of tree annotations found in *PennTreebank*.  One with part-of-speech labels (right), the other without them (left).
 	
