@@ -40,6 +40,8 @@ A `PennTreebankNode` represents a node in the PTB parse tree. There are two type
 	**Figure 4**: Topicalization. 
 
 
+#### Properties and Methods
+
 Use `isLeaf` to check whether the node is an internal node (i.e., a non-terminal like `NP`, `S`, `ADJP`, etc.) or a leaf node (a word, or a terminal, like `NNP/John`, `JJ/good`, etc.) For any node (either internal or leaf), the following fields are meaningful:
 
 *	`depth`: The depth of the node in the tree. The root node (usually *S*) has depth 0. The depth of a child is always 1 greater than the parent.
@@ -59,5 +61,5 @@ The following fields are only meaningful to leaf nodes.
 
 
 
-
+### Limitations
 Currently, the PTB module in this project is tested with the wsj part. 
