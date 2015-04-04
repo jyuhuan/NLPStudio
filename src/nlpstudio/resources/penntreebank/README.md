@@ -18,6 +18,7 @@ A `PennTreebankNode` represents a node in the PTB parse tree. There are two type
 	*	A **gap-mapping index**, which marks a constituent when it should be mapped to another constituent due to gapping. An example is shown below:
 	
 	<center><img src="http://yuhuan.me/articles/img/ptb-explained/gap-mapping.png" width="600" /></center>
+	
 	<center> **Figure 1**: A mapping of gappping. the `NP` for *Bill* maps to the  the `NP` for *Mary*, and the `NP` for *a pencil* maps to the `NP` for *a book*. </center>
 
 2.	A **word node** represents a word in the parse tree. Notice that PTB comes with two versions of trees. One is without the part-of-speech (POS) tags. The other has POS tags one level right above the words. The difference is shown in the following figure.
@@ -30,9 +31,11 @@ A `PennTreebankNode` represents a node in the PTB parse tree. There are two type
 	*	A **co-index** pointing to the constituent marked with the same co-index. The whole idea of co-indexing is used for constituent movements. Three major cause of movements are **<i>wh-</i> questions**, **topicalization**, and **passive voices**. Examples are shown below: 
 	
 	<center><img src="http://yuhuan.me/articles/img/ptb-explained/wh-movement.png" width="350" /></center>
+	
 	<center> **Figure 3**: *Wh-* movement. </center>
 	
 	<center><img src="http://yuhuan.me/articles/img/ptb-explained/topicalization.png" width="500" /></center>
+	
 	<center> **Figure 4**: Topicalization. </center>
 
 
