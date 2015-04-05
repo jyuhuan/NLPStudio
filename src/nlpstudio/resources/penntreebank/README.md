@@ -5,14 +5,14 @@ Each tree in the Penn Treebank (PTB) is represented as a `PennTreebankEntry`, wh
 ### Class `PennTreebankNode`
 A `PennTreebankNode` represents a node in a parse tree. There are two types of nodes: 
 
-1.	An **internal node** represents a non-terminal symbol, which subsumes one or more consecutive words. It is sometimes also referred to as a **constituent**. A constituent is mainly labeled by its **syntactic category**, including `S`, `NP`, `VP`, `ADJP`, etc.). Besides these usual syntactic category labels, each internal node can have some additional stuffs including:
+1.	An **internal node** represents a non-terminal symbol, which subsumes one or more consecutive words. It is sometimes also referred to as a **constituent**. A constituent is mainly labeled by its **syntactic category**, including `S`, `NP`, `VP`, `ADJP`, etc.). Besides these usual syntactic category labels, each internal node can have some additionally:
 
-	*	One or more **functional labels**, which mark the function of the constituent. For example, a node marked by `LGS` means that it is the **l**o**g**ical **s**ubject of the predicate in the tree, and `BNF` marks an internal node as playing the semantic role of a beneficiary. In the original PTB annotation, functional labels are connected to the a constituent's syntactic categorie with a hyphen: `NP-LGS-BNF`.  
+	*	One or more **functional labels**, which mark the function of the constituent. For example, a node marked by `LGS` means that it is the **l**o**g**ical **s**ubject of the predicate in the tree, and `BNF` marks an internal node as playing the semantic role of a **b**e**n**e**f**iciary. In the original PTB annotation, functional labels are connected to the a constituent's syntactic categorie with a hyphen: `NP-LGS-BNF`.  
 	*	A **co-index**, which is an integer number used to mark the constituent when
 	
-		*	a **null word** somewhere else in the tree is **co-indexing** with it.
-		* 	a constituent somewhere else in the tree is mapping to it due to **gapping**. 
-		* 	a constituent somewhere else in the tree is paired with it via **conjunction**. 
+		*	a **null word** somewhere else in the tree is **co-indexing** with it. That null word should have the same co-index as this constituent's. See description of word movements (below) for examples.
+		* 	a constituent somewhere else in the tree is mapping to it due to **gapping**. The constituent being mapped to this constituent should be labelled with a **gap-mapping index**. 
+		* 	a constituent somewhere else in the tree is paired with it via **conjunction**. The corresponding constituents between the two conjunctions are marked with increasing indices. 
 		
 		In the original PTB annotation, a co-index is connected to a constituent's syntactic category with a hyphen: `NP-SBJ-2`. 
 	*	A **gap-mapping index**, which marks a constituent when it should be mapped to another constituent due to gapping. An example is shown below:
@@ -20,6 +20,8 @@ A `PennTreebankNode` represents a node in a parse tree. There are two types of n
 		<img src="http://yuhuan.me/articles/img/ptb-explained/gap-mapping.png" width="600" />
 	
 		**Figure 1**: A mapping of gappping. the `NP` for *Bill* maps to the  the `NP` for *Mary*, and the `NP` for *a pencil* maps to the `NP` for *a book*.
+		
+		In the original PTB annotation, a gap-mapping index is connected to a constituent's syntactic category with an equal sign, before the co-index: `NP-BNF=2-1`
 
 2.	A **word node** represents a word in the parse tree. Notice that PTB comes with two versions of trees. One is without the part-of-speech (POS) tags. The other has POS tags one level right above the words. The difference is shown in the following figure.
 	
