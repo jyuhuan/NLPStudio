@@ -1,11 +1,11 @@
 ## Penn Treebank Reader
-Each Penn Treebank (PTB) tree is represented as a `PennTreebankTree`, which consists of
+Each tree in the Penn Treebank (PTB) is represented as a `PennTreebankEntry`, which consists of
 `PennTreebankNodes`. 
 
 ### Class `PennTreebankNode`
-A `PennTreebankNode` represents a node in the PTB parse tree. There are two types of nodes: 
+A `PennTreebankNode` represents a node in a parse tree. There are two types of nodes: 
 
-1.	An **internal node** represents a non-terminal symbol (or, **constituent**) in the parse tree (i.e., the **syntactic category** labels like `S`, `NP`, `VP`, `ADJP`, etc.). Besides these usual syntactic category labels, each internal node can have some additional stuffs including:
+1.	An **internal node** represents a non-terminal symbol, which subsumes one or more consecutive words. It is sometimes also referred to as a **constituent**. A constituent is mainly labeled by its **syntactic category**, including `S`, `NP`, `VP`, `ADJP`, etc.). Besides these usual syntactic category labels, each internal node can have some additional stuffs including:
 
 	*	One or more **functional labels**, which mark the function of the constituent. For example, a node marked by `LGS` means that it is the **l**o**g**ical **s**ubject of the predicate in the tree, and `BNF` marks an internal node as playing the semantic role of a beneficiary. In the original PTB annotation, functional labels are connected to the a constituent's syntactic categorie with a hyphen: `NP-LGS-BNF`.  
 	*	A **co-index**, which is an integer number used to mark the constituent when
