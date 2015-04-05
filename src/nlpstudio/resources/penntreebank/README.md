@@ -75,7 +75,7 @@ For any node (either internal or leaf), the following properties are meaningful:
 * 	`root`: The root of the tree where this node resides.
 *  	`prevWordNode`: The word node that is to the immediate left of the constituent that this node represents, if this node is an internal node; or simply the word before this node, if this node is a leaf node. 
 *   `nextWordNode`: Similar to `prevWordNode`.
-*   
+ 
 
 ###### Methods
 *	`apply(idx: Int)`: A short-hand to get the child at index `idx`. 
