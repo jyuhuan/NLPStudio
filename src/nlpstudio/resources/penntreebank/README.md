@@ -17,7 +17,7 @@ A `PennTreebankNode` represents a node in a parse tree. There are two types of n
 		In the original PTB annotation, a co-index is connected to a constituent's syntactic category with a hyphen: `NP-SBJ-2`. 
 	*	A **gap-mapping index**, which marks a constituent when it should be mapped to another constituent due to gapping. An example is shown below:
 	
-		<!--img src="http://yuhuan.me/articles/img/ptb-explained/gap-mapping.png" width="600" /-->
+		<img src="http://yuhuan.me/articles/img/ptb-explained/gap-mapping.png" width="600" />
 	
 		**Figure 1**: A mapping of gappping. the `NP` for *Bill* maps to the  the `NP` for *Mary*, and the `NP` for *a pencil* maps to the `NP` for *a book*.
 		
@@ -25,7 +25,7 @@ A `PennTreebankNode` represents a node in a parse tree. There are two types of n
 
 2.	A **word node** represents a word in the parse tree. Notice that PTB comes with two versions of trees. One is without the part-of-speech (POS) tags. The other has POS tags one level right above the words. The difference is shown in the following figure.
 	
-	<!--img src="http://yuhuan.me/articles/img/ptb-explained/pos-vs-no-pos.png" width="600" /-->
+	<img src="http://yuhuan.me/articles/img/ptb-explained/pos-vs-no-pos.png" width="600" />
 	
 	**Figure 2**: Two types of tree annotations found in *PennTreebank*.  One with part-of-speech labels (right), the other without them (left).
 	
@@ -33,11 +33,11 @@ A `PennTreebankNode` represents a node in a parse tree. There are two types of n
 	
 	*	A **co-index** pointing to the constituent marked with the same co-index. The whole idea of co-indexing is used for constituent movements. Three major cause of movements are **<i>wh-</i> questions**, **topicalization**, and **passive voices**. Examples are shown below: 
 	
-	<!--img src="http://yuhuan.me/articles/img/ptb-explained/wh-movement.png" width="500" /-->
+	<img src="http://yuhuan.me/articles/img/ptb-explained/wh-movement.png" width="500" />
 	
 	**Figure 3**: *Wh-* movement. 
 	
-	<!--img src="http://yuhuan.me/articles/img/ptb-explained/topicalization.png" width="600" /-->
+	<img src="http://yuhuan.me/articles/img/ptb-explained/topicalization.png" width="600" />
 	
 	**Figure 4**: Topicalization. 
 
