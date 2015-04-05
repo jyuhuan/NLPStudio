@@ -42,26 +42,64 @@ A `PennTreebankNode` represents a node in a parse tree. There are two types of n
 	**Figure 4**: Topicalization. 
 
 
-#### Properties and Methods
+#### Properties & Methods
+One thing to notice is that when the property does not exist (e.g., when you want to see the `posTag` of an internal node), `null` is returned rather than an exception being thrown. This will greatly simplify the user client code.
 
-Use `isLeaf` to check whether the node is an internal node (i.e., a non-terminal like `NP`, `S`, `ADJP`, etc.) or a leaf node (a word, or a terminal, like `NNP/John`, `JJ/good`, etc.) For any node (either internal or leaf), the following fields are meaningful:
+Use `isWord` to check whether the node is an internal node (i.e., a non-terminal like `NP`, `S`, `ADJP`, etc.) or a leaf node (a terminal, like `NNP/John`, `JJ/good`, etc.) 
+
+##### General Properties & Methods
+###### Perperties
+For any node (either internal or leaf), the following properties are meaningful:
 
 *	`depth`: The depth of the node in the tree. The root node (usually *S*) has depth 0. The depth of a child is always 1 greater than the parent.
-*	`parentNode`: The parent node. This differs from the inherited field `parent` in that `parent` returns the base trait `Node[String]` while `parentNode` returns a `PennTreebankNode` object. One may get the parent node by calling `parent` on a `PennTreebankNode` object, and then cast result to `PennTreebankNode` using `.parent.asInstanceOf[PennTreebankNode]`. 
-*	`childrenNodes`: The children nodes. Similar to the difference of `parent` and `parentNode`, `childrenNodes` returns directly an `ArrayBuffer` of `PennTreebankNode`s, while `children` returns an `ArrayBuffer` of the trait `Node[String]`. 
-*	`syntacticCategory`: The syntactic category of the node. This does not contain functional tags (e.g., `BNF`, `CLR`) or any co-indices (e.g., the number `2` in `NP-SBJ-2`). For an internal node (a non-terminal), this is the syntactic category itself. For a leaf node (a word), it is the POS tag of the word. 
-*	`indexInSiblings`: The index of this node among all siblings, starting from 0. For example, in the following figure, 
+*	`parentNode`: The parent node. If no parent is found (i.e., when this node is already the root, `null` is returned. 
+*	`childrenNodes`: The children nodes. Similar to the difference of `parent` and `parentNode`, `childrenNodes` returns directly an `ArrayBuffer` of `PennTreebankNode`s, while `children` returns an `ArrayBuffer` of `Node[String]`s. If no children is found, the returned value should be an empty `ArrayBuffer[PennTreebankNode]` rather than `null`. 
+*	`indexInSiblings`: The index of this node among all siblings, starting from 0. If there is not parent, `-1` is returned. For example, in the following figure, 
 	
 	<center><img src="http://yuhuan.me/articles/img/ptb-explained/sibling-indices.png" width="200" /></center>
 	
-	the node with syntactic category `CC` is the second among its siblings. Thus its `indexInsiblings` is `1`.
+	the node with syntactic category `CC` is the second among its siblings. Thus its `indexInsiblings` is `1`. For the `NP` at the top, its `indexInSiblings` is `-1`. 
 
-The following fields are only meaningful to leaf nodes.
+* 	`syntacticHead`: Syntactic head of the node (still a node object). Does not go all the way to word nodes. Only returns the head that is an immediate child of this node. When called on a leaf node, it simply returns the leaf node itself. When no head is found (e.g., when the children of this node are all empty elements), `null` is returned. 
+*	`syntacticHeadWord`: Syntactic head word of the node (the node of that word actually). `syntacticHead` is called multiple times to find the word node. When no head is found `null` is returned.
+*	`semanticHead`: Semantic head word of the node. The implementation is from M. Gerber's code. 
 
+###### Methods
+*	`apply(idx: Int)`: A short-hand to get the child at index `idx`. 
+
+##### Special Properties & Methods
+
+The following properties are only meaningful to **internal** nodes.
+
+*	`syntacticCategory`: The syntactic category of the node. This does not contain functional tags (e.g., `BNF`, `CLR`), co-indices (e.g., the number `2` in `NP-SBJ-2`), or gap-mapping index (e.g., the number `1` in `NP-BNF=1`). 
+*	`allNodes`: All nodes subsumed under this node, including internal and leaf nodes. 
+* 	`wordNodes`: All leaf nodes subsumed under this node. 
+*  	`words`: All words (`String`s) subsumed under this node. 
+*   `firstWordNode`: The node of the first word subsumed by this node.
+*   ``
+
+
+The following properties are only meaningful to **leaf** nodes.
+
+*	`surface`: The surface of the word, i.e., the word as it is in the corpus. 
 *	`wordIndex`: The index of the word in the sentence, starting form 0.
-* 	(to be finished...)
+* 	`posTag`: The part-of-speech tag of the word. 
 
+##### A Note for Curious Users
 
+There are some methods (defined using the `def` keyword) that you find unmentioned above, namely, `data`, `isLeaf`, `parent`, `children`, `leaves`. They are inherited from the parent trait `Node[String]`. 
+
+*	`data` is simply set to be the same as `content`. If the user tries to call `data`, he/she actually gets the value of the variable `content` (discussed below) at that time. 
+* 	`isLeaf` is already implemented in the trait `Node[String]`. The class `PennTreebankNode` exposes instead a property named `isWord`. A simple change, a largely more straightforward name. 
+*	`parent`'s return value, as defined in the trait, should be of type `Node[String]`. But the client user of my `PennTreebankNode` will want just a `PennTreebankNode` object to be returned. Of course, one may also take a detour to get the parent node by calling `parent` on a `PennTreebankNode` object, and then cast the result to `PennTreebankNode` using `.parent.asInstanceOf[PennTreebankNode]`.
+* 	`children` is similar to `parent`, but there is a technical problem that prevents client users to use this. They are more likely to want `ArrayBuffer[PennTreebankNode]` rather than `ArrayBuffer[Node[String]]`. However, `ArrayBuffer[T]` is a mutable type. Therefore, its type parameter `T` is invariant, rendering `ArrayBuffer[PennTreebankNode]` not being a subclass of `ArrayBuffer[Node[String]]`, even though `PennTreebankNode` is a subclass of `Node[String]`. 
+*  	`leaves` returns all leaf nodes, just like what `wordNodes` does. For the same reason as `children`, I do not suggest users to access the leaf word nodes via this property. 
+
+There is one more thing unmentioned, `content`. The variable `content` is not exposed to user because it will confuse the user. The confusion comes from the fact that a `PennTreebankNode` can sometimes be an internal node, and sometimes a leaf. When the node is an internal node, the `content` variable holds the syntactic category. When the node is a leaf, the `content` variable holds the surface word. Users are recommended to use the properties `syntacticCategory` and `surface` to access these two information respectively. 
+
+#### FAQ
+##### How May `PennTreebank` Facilitate Cross Validation?
+A convenient method is exposed for users to split the PTB by sections, in a conventional way that many papers do. 
 
 ### Limitations
-Currently, the PTB module in this project is tested with the wsj part. 
+Currently, the PTB module in this project is only tested with the wsj part. 
