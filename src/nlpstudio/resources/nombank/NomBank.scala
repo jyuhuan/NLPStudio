@@ -122,7 +122,9 @@ object NomBank {
 
   /**
    * Loads NomBank 1.0. Users can iterate over the return value by NomBankEntry's.
-   * @param pathToNomBank Path to the file "nombank.1.0"
+   * @param pathToNomBank The path to the file "nombank.1.0". Remember to remove line 63292 before
+   *                      calling this method. Line 63292 contains an error: The 6th word node in
+   *                      the tree has only 8 ancestors, but there is 6:9 in it.
    * @param pathToPennTreebank Path to the directory "parsed/mrg/wsj"
    * @return A sequence of NomBankEntry's.
    */
@@ -145,6 +147,38 @@ object NomBank {
     entries.toArray
   }
 
+  /**
+   * Loads fine-grained entries. In the original NomBank annotation, one entry contains:
+   * <ol>
+   *   <li> The predicate </li>
+   *   <li> Arg0 of the predicate </li>
+   *   <li> Arg1 of the predicate </li>
+   *   <li> ... </li>
+   *   <li> Argm-TMP of the predicate </li>
+   *   <li> Support verb of the predicate </li>
+   *   <li> ... </li>
+   * </ol>
+   *
+   * This method breaks all the annotations for the predicate p. Thus, the result will be:
+   *
+   * <ul>
+   *   <li> Predicate, Arg0 </li>
+   *   <li> Predicate, Arg1 </li>
+   *   <li> ... </li>
+   *   <li> Predicate, Argm-TMP </li>
+   *   <li> Predicate, Support verb </li>
+   *   <li> ... </li>
+   * </ul>
+   *
+   * Notice that this is not suitable for training, because there are no negative samples (i.e.,
+   * those with label "null")
+   *
+   * @param pathToNomBank The path to the file "nombank.1.0". Remember to remove line 63292 before
+   *                      calling this method. Line 63292 contains an error: The 6th word node in
+   *                      the tree has only 8 ancestors, but there is 6:9 in it.
+   * @param pathToPennTreebank Path to the directory "parsed/mrg/wsj".
+   * @return
+   */
   def loadAsFineGrainedEntries(pathToNomBank: String, pathToPennTreebank: String): Array[NomBankFineGrainedEntry] = {
     val coarseEntries = load(pathToNomBank, pathToPennTreebank)
     coarseEntries.flatMap(e ⇒ {
@@ -154,5 +188,7 @@ object NomBank {
         NomBankFineGrainedEntry(e.sectionId, e.mrgFileId, e.treeId, e.predicateNode, e.stemmedPredicate, e.senseId, n, supportVerbNodes, a.label, a.functionTags, e.parseTree)
       }))})
   }
+
+
 
 }
