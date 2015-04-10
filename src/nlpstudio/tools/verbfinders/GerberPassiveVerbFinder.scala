@@ -5,6 +5,11 @@ import nlpstudio.resources.penntreebank.PennTreebankNode
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 3/24/15.
  */
+
+/**
+ * Determines if a Penn Treebank leave node (word node) is a passive verb.
+ * From Matthew Gerber's C# project on http://ptl.sys.virginia.edu/ptl/members/matthew-gerber
+ */
 object GerberPassiveVerbFinder {
   val beVerbs = Set("am", "are", "is", "was", "were", "been", "being", "become", "became")
   def isPassive(node: PennTreebankNode): Boolean = {

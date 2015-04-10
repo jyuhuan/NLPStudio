@@ -1,7 +1,6 @@
 package nlpstudio.tools.headfinders
 
 import nlpstudio.resources.penntreebank.PennTreebankNode
-import nlpstudio.tools.headfinders.NullElementHasNoHeadException
 
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 3/22/15.
@@ -40,7 +39,7 @@ object CollinsHeadFinder extends HeadFinder {
   private def findFirst(scope: IndexedSeq[PennTreebankNode], keys: IndexedSeq[String], direction: FindDirection): PennTreebankNode = {
     val toBeSearched = if (direction == FindDirection.LeftToRight) scope else scope.reverse
     for (key ← keys) {
-      val finding = toBeSearched.find(_.syntacticCategory == key)
+      val finding = toBeSearched.find(_.syntacticCategoryOrPosTag == key)
       if (finding != None) return finding.get
     }
     null
@@ -65,7 +64,7 @@ object CollinsHeadFinder extends HeadFinder {
     val childrenNodes = node.childrenNodes
 
 
-    val category = node.syntacticCategory
+    val category = node.syntacticCategoryOrPosTag
     // Deal with NP
     if (category == "NP") {
 
@@ -102,10 +101,10 @@ object CollinsHeadFinder extends HeadFinder {
 
 
     // If <constituent, CC, head>, then constituent should be the head.
-    val nodeIndex = head.index
+    val nodeIndex = head.siblingIndex
 
     try {
-      if (nodeIndex >= 2 && node.childrenNodes(nodeIndex - 1).syntacticCategory == "CC")
+      if (nodeIndex >= 2 && node.childrenNodes(nodeIndex - 1).syntacticCategoryOrPosTag == "CC")
         head = node.childrenNodes(nodeIndex - 2)
     }
     catch {
@@ -114,7 +113,7 @@ object CollinsHeadFinder extends HeadFinder {
       }
     }
 
-    if (nodeIndex >= 2 && node.childrenNodes(nodeIndex - 1).syntacticCategory == "CC")
+    if (nodeIndex >= 2 && node.childrenNodes(nodeIndex - 1).syntacticCategoryOrPosTag == "CC")
       head = node.childrenNodes(nodeIndex - 2)
     return head
   }

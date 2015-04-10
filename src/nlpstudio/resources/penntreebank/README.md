@@ -5,7 +5,7 @@ Each tree in the Penn Treebank (PTB) is represented as a `PennTreebankEntry`, wh
 ### Class `PennTreebankNode`
 A `PennTreebankNode` represents a node in a parse tree. There are two types of nodes: 
 
-1.	An **internal node** represents a non-terminal symbol, which subsumes one or more consecutive words. It is sometimes also referred to as a **constituent**. A constituent is mainly labeled by its **syntactic category**, including `S`, `NP`, `VP`, `ADJP`, etc.). Besides these usual syntactic category labels, each internal node can have some additionally:
+1.	An **internal node** represents a non-terminal symbol, which subsumes one or more consecutive words. It is sometimes also referred to as a **constituent**. A constituent is mainly labeled by its **syntactic category**, including `S`, `NP`, `VP`, `ADJP`, etc.). Besides these usual syntactic category labels, each internal node can have some additional data:
 
 	*	One or more **functional labels**, which mark the function of the constituent. For example, a node marked by `LGS` means that it is the **l**o**g**ical **s**ubject of the predicate in the tree, and `BNF` marks an internal node as playing the semantic role of a **b**e**n**e**f**iciary. In the original PTB annotation, functional labels are connected to the a constituent's syntactic category with a hyphen: `NP-LGS-BNF`.  
 	*	A **co-index**, which is an integer number used to mark the constituent when
@@ -40,7 +40,8 @@ A `PennTreebankNode` represents a node in a parse tree. There are two types of n
 	<img src="http://yuhuan.me/articles/img/ptb-explained/topicalization-move.png" width="600" />
 	
 	**Figure 4**: Topicalization. 
-
+	
+	In the original PTB annotation, the co-index is connected to the word with a hyphen.
 
 #### Properties & Methods
 One thing to notice is that, unless said otherwise, when the property does not exist (e.g., when you want to see the `posTag` of an internal node), `null` is returned. An exception is avoided because catching exception is a headache, and we want the user client code to be simple.
@@ -90,7 +91,8 @@ For any node (either internal or leaf), the following properties are meaningful:
 
 The following properties are only meaningful to **internal** nodes.
 
-*	`syntacticCategory`: The syntactic category of the node. This does not contain functional tags (e.g., `BNF`, `CLR`), co-indices (e.g., the number `2` in `NP-SBJ-2`), or gap-mapping index (e.g., the number `1` in `NP-BNF=1`). 
+*	`syntacticCategory`: The syntactic category of the node. This does not contain functional labels (e.g., `BNF`, `CLR`), co-indices (e.g., the number `2` in `NP-SBJ-2`), or gap-mapping index (e.g., the number `1` in `NP-BNF=1`). 
+*	`functionalLabels`: The functional labels (e.g., `BNF`, `CLR`)
 *	`allNodes`: All nodes subsumed under this node, including internal and leaf nodes. 
 * 	`wordNodes`: All leaf nodes subsumed under this node. 
 *  	`words`: All words (`String`s) subsumed under this node. 

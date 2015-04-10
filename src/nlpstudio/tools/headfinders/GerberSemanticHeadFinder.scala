@@ -18,14 +18,14 @@ object GerberSemanticHeadFinder extends HeadFinder {
     try {
       var semanticHead = ptbNode.syntacticHeadWord
       if (semanticHead != null && semanticHead.parent != null) {
-        if (shiftRules contains semanticHead.syntacticCategory) {
-          val dir = shiftRules(semanticHead.syntacticCategory)
+        if (shiftRules contains semanticHead.syntacticCategoryOrPosTag) {
+          val dir = shiftRules(semanticHead.syntacticCategoryOrPosTag)
           if ((dir == FindDirection.LeftToRight && semanticHead.rightSiblings.length > 0) ||
             (dir == FindDirection.RightToLeft && semanticHead.leftSiblings.length > 0)) {
             val siblings = if (dir == FindDirection.LeftToRight) semanticHead.rightSiblings else semanticHead.leftSiblings.reverse
 
             try {
-              semanticHead = siblings.find(n ⇒ !n.isNullElement && n.semanticHead != null).get.semanticHead
+              semanticHead = siblings.find(n ⇒ !n.isNullElement && n.semanticHeadWord != null).get.semanticHeadWord
             }
             catch {
               case e: NoSuchElementException ⇒ {
