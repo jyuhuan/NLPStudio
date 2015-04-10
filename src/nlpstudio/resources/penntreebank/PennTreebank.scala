@@ -1,7 +1,7 @@
 package nlpstudio.resources.penntreebank
 
-import nlpstudio.io.files.{directory, TextFile}
-import nlpstudio.utilities.RegularExpressions
+import nlpstudio.io.files.{Directory, TextFile}
+import nlpstudio.utilities.{StringUtilities, RegularExpressions}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -11,15 +11,27 @@ import scala.collection.mutable.ArrayBuffer
  */
 
 object PennTreebank {
-
-  //def apply(pathToPennTreebankWsjDir: String) = new PennTreebank(pathToPennTreebankWsjDir)
-
   /**
-   * Breaks "NP-SBJ-BNF" to ("NP", ["SBJ", "BNF"]).
-   * @param s A string in the form of "NP-SBJ-BNF"
-   * @return A tuple. _1 is "NP". _2 is ["SBJ", "BNF"].
+   * Extracts fields from the labels that appear immediately after the left parentheses.
+   * The input string can take the following form:
+   * <ul>
+   *   <li> NP </li>
+   *   <li> NP-SBJ </li>
+   *   <li> NP-SBJ-1 </li>
+   *   <li> NP-SBJ=1-3 </li>
+   *   <li> -NONE- </li>
+   * </ul>
+   *
+   * @param s The input string of the form. (See the method description for example inputs).
+   * @return A tuple, consisting of the following:
+   *         <ol>
+   *           <li> The pure syntactic label. </li>
+   *           <li> The gap-mapping index (the number after the equal sign) </li>
+   *           <li> The co-index (the number after the hyphen) </li>
+   *           <li> The functional labels </li>
+   *         </ol>
    */
-  def splitCompoundSyntacticCategory(s: String): (String, Int, Int, Array[String]) = {
+  def bracketLabelSplitter(s: String): (String, Int, Int, Array[String]) = {
     if (s(0) == '-') return (s, -1, -1, Array[String]())
     else {
       var mapId: Int = -1
@@ -33,6 +45,44 @@ object PennTreebank {
       if ("0123456789" contains parts.last(0))
         return (parts(0), parts.last.toInt, mapId, parts.slice(1, parts.length - 1))
       else return (parts(0), -1, mapId, parts.slice(1, parts.length))
+    }
+  }
+
+  /**
+   * Extracts fields from the labels that appear immediately before the right parentheses.
+   * The input string can take the following form:
+   * <ul>
+   *   <li> hello </li>
+   *   <li> *-3 </li>
+   *   <li> *T*-2 </li>
+   *   <li> *ICH*-2 </li>
+   *   <li> *U* </li>
+   * </ul>
+   * @param s
+   * @return A pair, (word, coIndex)
+   */
+  def wordSplitter(s: String): (String, Int) = {
+    try {
+      if (s(0) == '-') (s, -1)
+      else {
+        if (StringUtilities.isDigit(s.last) && s.contains('-')) {
+          val splits = s.split('-')
+          val lastPart = splits.last
+          if (StringUtilities.areAllDigits(lastPart)) {
+            val coIndex = splits.last.toInt
+            val word = splits.head
+            (word, coIndex)
+          }
+          else (s, -1)
+        }
+        else (s, -1)
+      }
+    }
+    catch {
+      case e: Exception ⇒ {
+        val bp = 0
+        return null
+      }
     }
   }
 
@@ -53,7 +103,7 @@ object PennTreebank {
     val tokens = rawTokens.slice(2, rawTokens.length - 2)
 
     val firstToken = tokens(0)
-    val catAndLabel = splitCompoundSyntacticCategory(firstToken)
+    val catAndLabel = bracketLabelSplitter(firstToken)
     var curNode = PennTreebankNode(0, catAndLabel._1, catAndLabel._2, catAndLabel._3, catAndLabel._4, null, null)
 
     var tokenCounter = 0
@@ -70,17 +120,25 @@ object PennTreebank {
       else {
         if (curNode.data.length > 0) {
           // a word node
+
+          // set part-of-speech tag
           curNode.posTag = curNode.data
-          curNode.content = token
+
+          // set surface word and co-index
+          val wordAndCoIndex = wordSplitter(token)
+          curNode.content = wordAndCoIndex._1
+          curNode.coIndex = wordAndCoIndex._2
+
+          // set word index (in the sentence)
           curNode.wordIndex = tokenCounter
           tokenCounter += 1
         }
         else {
-          val newCatAndLabel = splitCompoundSyntacticCategory(token)
+          val newCatAndLabel = bracketLabelSplitter(token)
           curNode.content = newCatAndLabel._1
-          curNode.referenceId = newCatAndLabel._2
-          curNode.mapId = newCatAndLabel._3
-          curNode.functionalTags = newCatAndLabel._4
+          curNode.coIndex = newCatAndLabel._2
+          curNode.mapIndex = newCatAndLabel._3
+          curNode.functionalLabels = newCatAndLabel._4
         }
       }
     }
@@ -119,7 +177,7 @@ object PennTreebank {
 
 
   def parseSection(dir: String): Array[Array[PennTreebankEntry]] = {
-    val allFiles = directory.allFilesWithExtension(dir, "mrg")
+    val allFiles = Directory.allFilesWithExtension(dir, "mrg")
     (for (mrgFile ← allFiles) yield {
       val path = mrgFile.getAbsolutePath
       val pathSplits = path.split('/')
@@ -134,7 +192,7 @@ object PennTreebank {
 
 
   def load(pathToCorpusDir: String): Array[Array[Array[PennTreebankEntry]]] = {
-    (for (subDir <- directory.allSubdirectories(pathToCorpusDir)) yield parseSection(subDir.getAbsolutePath)).toArray
+    (for (subDir <- Directory.allSubdirectories(pathToCorpusDir)) yield parseSection(subDir.getAbsolutePath)).toArray
   }
 
 }
