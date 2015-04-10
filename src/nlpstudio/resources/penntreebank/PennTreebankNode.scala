@@ -19,41 +19,34 @@ import scala.collection.mutable.ArrayBuffer
  */
 
 /**
- * A node in a PennTreebank parse tree. Provides a wide range of methods good for feature extraction.
  *
- * @param depth Depth of the node in the tree. The root node's depth is 0.
- *              
- * @param content This is either
- *                <ol>
- *                  <li> the syntactic category (without functional labels like `"SBJ"`) for
- *                       internal nodes, or </li>
- *                  <li> surface words for leaf nodes. </li>
- *                </ol>
- *
- * @param functionalTags Functional tags. E.g., `["BNF", "SBJ", "LOC"]`, ...
- *
- * @param parentNode The parent PennTreebankNode. This is different from the `parent` property
- *                   inherited from the trait [[foundation.math.graph.Node Node]]. That `parent`
- *                   returns a `Node[String]` object, while `parentNode` is directly a
- *                   [[nlpstudio.resources.penntreebank.PennTreebankNode PennTreebankNode]] object,
- *                   saving the effort to do downward type casting.
- *
- * @param childrenNodes The children of this node. This is different from the `children` property
- *                   inherited from the trait [[foundation.math.graph.Node Node]]. That `children`
- *                   returns an immutable array of `Node[String]` objects, while this `childrenNodes`
- *                   is directly a mutable array of
- *                   [[nlpstudio.resources.penntreebank.PennTreebankNode PennTreebankNode]] objects,
- *                   saving the effort to do downward type casting.
+ * @param content Either surface word or syntactic category.
+ *                Set only the syntactic category label. Put the functional labels in
+ *                `functionalLabels`, co-indices (either inward or outward) in `coIndex`,
+ *                and gap-mapping indices in `mapIndex`.
+ * @param depth The depth of the node in the tree.
+ *              The root node (usually S) has depth 0.
+ *              The depth of a child is always 1 greater than the parent.
+ * @param parentNode The parent node.
+ *                   If no parent, set to `null`.
+ * @param childrenNodes The children nodes.
+ *                      If no children, set to an empty ArrayBuffer[PennTreebankNode] rather than
+ *                      `null`.
+ * @param coIndex The co-index. (See documentation for what it is)
+ * @param mapIndex The mapping index for gapping. (See documentation for what it is)
+ * @param functionalLabels The functional labels.
  */
-class PennTreebankNode private(var depth: Int,
-                               var content: String,
-                               var referenceId: Int,
-                               var mapId: Int,
-                               var functionalTags: Seq[String],
-                               var parentNode: PennTreebankNode,
-                               var childrenNodes: mutable.ArrayBuffer[PennTreebankNode]) extends Node[String] {
+class PennTreebankNode private(
+                                var content: String,
+                                var depth: Int,
+                                var parentNode: PennTreebankNode,
+                                var childrenNodes: mutable.ArrayBuffer[PennTreebankNode],
+                                var coIndex: Int,
+                                var mapIndex: Int,
+                                var functionalLabels: Seq[String]
+                                ) extends Node[String] {
 
-  // Conforming to the trait
+  //region Conforming to the trait
 
   override def data: String = content
   override def parent: Node[String] = parentNode
@@ -61,49 +54,114 @@ class PennTreebankNode private(var depth: Int,
   override def isLeaf: Boolean = childrenNodes.isEmpty
   override def toString = data.toString
 
+  //endregion
 
-  // Actions
-
+  //region Detectors
   /**
-   * Adds a new [[nlpstudio.resources.penntreebank.PennTreebankNode PennTreebankNode]] to this node.
-   * @param newNode A new [[nlpstudio.resources.penntreebank.PennTreebankNode PennTreebankNode]] node.
-   * @return The new node added.
+   * Whether the node is a word node.
+   * If true, only the general properties and special properties for words are meaningful.
+   * If false, only the general properties and special properties for constituents are meaningful.
+   * This library does not perform this check when properties are accessed, because these properties
+   * are often frequently accessed in a loop, and the user often knows what type of node he/she is
+   * working with.
    */
-  def addChild(newNode: PennTreebankNode) = {
-    newNode.parentNode = this
-    this.childrenNodes += newNode
-    newNode
+  def isWord = this.isLeaf
+
+  /** Whether the node subsumes or is itself of category `-NONE-` */
+  def isNullElement: Boolean = {
+    if (isLeaf) syntacticCategoryOrPosTag == "-NONE-"
+    else childrenNodes.forall(n ⇒ n.isNullElement)
   }
 
+
+
+  //endregion
+
+  //region Special properties for a word node
+  /**
+   * The surface form of this word.
+   * If this node is a constituent, then the syntactic category will be returned.
+   */
+  def surface = content
+
+  /**
+   * The part of speech tag of the node if this node is a word node.
+   * If this node is a constituent, then `null`
+   */
+  var posTag: String = null
+
+  /**
+   * The index of the word in the sentence, starting form 0.
+   * If this node is a constituent, then -1.
+   */
+  var wordIndex: Int = -1
+
+  /**
+   * Whether this word node represents a passive verb.
+   * If this node is a constituent, `false` will be returned directly.
+   */
+  def isPassive: Boolean = GerberPassiveVerbFinder.isPassive(this)
+
+  //endregion
+
+  //region Special properties for an internal node
+
+  /**
+   * The syntactic category of this constituent.
+   * If this node is a word, then the surface form of this word is shown.
+   * @return
+   */
+  def syntacticCategory = this.content
+
+  /**
+   * All nodes subsumed under this node, including both constituents and words.
+   * @return A collection of all nodes.
+   */
   def allNodes = {
     this.traverse().map(x ⇒ x.asInstanceOf[PennTreebankNode])
   }
 
-  /**
-   * Gets the child [[nlpstudio.resources.penntreebank.PennTreebankNode PennTreebankNode]] at a given index.
-   * @param idx The index of the child.
-   * @return The child.
-   */
-  def apply(idx: Int) = childrenNodes(idx)
+  /** All leave nodes subsumed by this node.
+    * Different from the inherited `leaves` method in that this method returns an iterable of
+    * [[nlpstudio.resources.penntreebank.PennTreebankNode PennTreebankNode]]'s, while the `leaves`
+    * method returns one with `Node[String]`'s.
+    */
+  def wordNodes = this.leaves.map(n ⇒ n.asInstanceOf[PennTreebankNode])
 
+  /** All words subsumed by this node. */
+  def words = this.leaves.map(n ⇒ n.data)
 
-  // Properties
+  /** The node of the first word subsumed by this node. */
+  def firstWordNode = traverse(n ⇒ n.children, n ⇒ n.isLeaf, n ⇒ n.isLeaf, n ⇒ Unit).head.asInstanceOf[PennTreebankNode]
 
-  /** The part of speech tag of the node. Not `null` only if the node is a leave (which represents a word) */
-  var posTag: String = null
+  /** The first word (in [[String]]) subsumed by this node. */
+  def firstWord = firstWordNode.content
 
-  var wordIndex: Int = -1
+  /** The part of speech tag of the first word subsumed by this node. */
+  def firstPos = firstWordNode.posTag
 
-  /** The index of this node among all siblings. */
-  def index: Int = {
-    if (this.parentNode == null) return -1
-    else return this.parentNode.children.indexOf(this)
-  }
+  /** The node of the last word subsumed by this node. */
+  def lastWordNode = traverse(n ⇒ n.children.reverse, n ⇒ n.isLeaf, n ⇒ n.isLeaf, n ⇒ Unit).head.asInstanceOf[PennTreebankNode]
+
+  /** The last word (in [[String]]) subsumed by this node. */
+  def lastWord = lastWordNode.content
+
+  /** The part of speech tag of the last word subsumed by this node. */
+  def lastPos = lastWordNode.posTag
+  //endregion
+
+  //region General Properties (meaningful to both words and constituents)
 
   /** Returns the part of speech tag, if the node is a leave (which represents a word).
     * Otherwise, returns the syntactic category defined in ''Penn Treebank'' (e.g., `"NP"`, `"VP"`).
     */
-  def syntacticCategory = if (posTag != null) posTag else this.content
+  def syntacticCategoryOrPosTag = if (posTag != null) posTag else this.content
+
+  /** The index of this node among all siblings. */
+  def siblingIndex: Int = {
+    if (this.parentNode == null) return -1
+    else return this.parentNode.children.indexOf(this)
+  }
 
   /**
    * Syntactic head of the node. Does not go all the way to word nodes. Only returns the head that
@@ -133,59 +191,17 @@ class PennTreebankNode private(var depth: Int,
   }
 
   /** The semantic head of the node. Goes all the way to a word node. Reference: (Gerber, 2011) */
-  def semanticHead = GerberSemanticHeadFinder(this)
-
-  //def objectHead
-
-  /** All leave nodes subsumed by this node.
-    * Different from the inherited `leaves` method in that this method returns an iterable of
-    * [[nlpstudio.resources.penntreebank.PennTreebankNode PennTreebankNode]]'s, while the `leaves`
-    * method returns one with `Node[String]`'s.
-    */
-  def wordNodes = this.leaves.map(n ⇒ n.asInstanceOf[PennTreebankNode])
-
-  /** All words subsumed by this node. */
-  def words = this.leaves.map(n ⇒ n.data)
-
-  /** The node of the first word subsumed by this node. */
-  def firstWordNode = traverse(n ⇒ n.children, n ⇒ n.isLeaf, n ⇒ n.isLeaf, n ⇒ Unit).head.asInstanceOf[PennTreebankNode]
-
-  /** The first word (in [[String]]) subsumed by this node. */
-  def firstWord = firstWordNode.content
-
-  /** The part of speech tag of the first word subsumed by this node. */
-  def firstPos = firstWordNode.posTag
-
-  /** The node of the last word subsumed by this node. */
-  def lastWordNode = traverse(n ⇒ n.children.reverse, n ⇒ n.isLeaf, n ⇒ n.isLeaf, n ⇒ Unit).head.asInstanceOf[PennTreebankNode]
-
-  /** The last word (in [[String]]) subsumed by this node. */
-  def lastWord = lastWordNode.content
-
-  /** The part of speech tag of the last word subsumed by this node. */
-  def lastPos = lastWordNode.posTag
+  def semanticHeadWord = GerberSemanticHeadFinder(this)
 
   /** The context-free grammar rule that expanded the node */
   def rule: Rule = {
     if (this.parent == null) return null
-    Rule(this.parentNode.syntacticCategory, this.parentNode.childrenNodes.map(_.syntacticCategory))
-  }
-
-  /** Whether the node is a word node. A word node is different from an internal node in that, the
-    * `content` field has the surface word, and the `posTag` field has the part of speech tag.
-    * An internal node's `content` is the syntactic category, and its `posTag` is `null`.
-    */
-  def isWord = this.isLeaf
-
-  /** Whether the node subsumes or is itself of category `"NONE"` */
-  def isNullElement: Boolean = {
-    if (isLeaf) syntacticCategory == SpecialCategories.nullElement
-    else childrenNodes.forall(n ⇒ n.isNullElement)
+    Rule(this.parentNode.syntacticCategoryOrPosTag, this.parentNode.childrenNodes.map(_.syntacticCategoryOrPosTag))
   }
 
   /** All siblings to the left of this node */
   def leftSiblings: ArrayBuffer[PennTreebankNode] = {
-    val indexUnderParent = this.index
+    val indexUnderParent = this.siblingIndex
 
     // This node might already be the root:
     if (this.parent == null) return ArrayBuffer[PennTreebankNode]()
@@ -197,7 +213,7 @@ class PennTreebankNode private(var depth: Int,
 
   /** The sibling node immediately to the left of this node */
   def leftSibling: PennTreebankNode = {
-    val indexUnderParent = this.index
+    val indexUnderParent = this.siblingIndex
 
     // This node might already be the root:
     if (indexUnderParent == -1) return null
@@ -210,7 +226,7 @@ class PennTreebankNode private(var depth: Int,
 
   /** All siblings to the right of this node */
   def rightSiblings: ArrayBuffer[PennTreebankNode] = {
-    val indexUnderParent = this.index
+    val indexUnderParent = this.siblingIndex
 
     // This node might already be the root:
     if (this.parent == null) return ArrayBuffer[PennTreebankNode]()
@@ -223,7 +239,7 @@ class PennTreebankNode private(var depth: Int,
   /** The sibling node immediately to the right of this node */
   def rightSibling: PennTreebankNode = {
 
-    val indexUnderParent = this.index
+    val indexUnderParent = this.siblingIndex
 
     // This node might already be the root:
     if (indexUnderParent == -1) return null
@@ -233,44 +249,6 @@ class PennTreebankNode private(var depth: Int,
     if (indexUnderParent <= allSiblings.length - 2 && indexUnderParent >= 0) allSiblings(indexUnderParent + 1)
     else null
   }
-
-  def rightMost(isGoal: PennTreebankNode ⇒ Boolean): PennTreebankNode = {
-    def succ(n: PennTreebankNode): Iterable[PennTreebankNode] = {
-      val successors = ArrayBuffer[PennTreebankNode]()
-      successors ++= n.childrenNodes
-      successors
-    }
-    try {
-      SimpleSearcher.depthFirstSearch(this, isGoal, succ)
-    }
-    catch {
-      case e: GoalNotFoundException ⇒ null
-    }
-  }
-
-  def ancestors: Set[PennTreebankNode] = {
-    val result = ArrayBuffer[PennTreebankNode]()
-    var cur = this
-    var done = false
-    while (!done) {
-      cur = cur.parentNode
-      if (cur == null) done = true
-      else result += cur
-    }
-    result.toSet
-  }
-
-  def lowestCommonAncestor(other: PennTreebankNode): PennTreebankNode = {
-    val myAncestors = this.ancestors
-    val otherAncestors = other.ancestors
-    if (myAncestors.isEmpty) return this
-    else if (myAncestors.isEmpty) return other
-    else {
-      val intersect = myAncestors intersect otherAncestors
-      intersect.maxBy(_.depth)
-    }
-  }
-
 
   def root: PennTreebankNode = {
     var cur = this
@@ -297,7 +275,85 @@ class PennTreebankNode private(var depth: Int,
     all(lastIdx + 1)
   }
 
-  def isRightAdjacentTo(condition: PennTreebankNode ⇒ Boolean): PennTreebankNode = {
+  def ancestors: ArrayBuffer[PennTreebankNode] = {
+    val result = ArrayBuffer[PennTreebankNode]()
+    var cur = this
+    var done = false
+    while (!done) {
+      cur = cur.parentNode
+      if (cur == null) done = true
+      else result += cur
+    }
+    result
+  }
+
+  //endregion
+
+  //region Methods
+
+  /**
+   * Gets the child [[nlpstudio.resources.penntreebank.PennTreebankNode PennTreebankNode]] at a given index.
+   * @param idx The index of the child.
+   * @return The child.
+   */
+  def apply(idx: Int) = childrenNodes(idx)
+
+  /**
+   * Adds a new [[nlpstudio.resources.penntreebank.PennTreebankNode PennTreebankNode]] to this node.
+   * @param newNode A new [[nlpstudio.resources.penntreebank.PennTreebankNode PennTreebankNode]] node.
+   * @return The new node added.
+   */
+  def addChild(newNode: PennTreebankNode) = {
+    newNode.parentNode = this
+    this.childrenNodes += newNode
+    newNode
+  }
+
+  /**
+   * Finds the right most node that satisfies the given goal test.
+   * @param isGoal The goal test. The algorithm thinks it has found the goal if this returns true.
+   * @return The right most node that satisfies the given goal test.
+   */
+  def rightMost(isGoal: PennTreebankNode ⇒ Boolean): PennTreebankNode = {
+    def succ(n: PennTreebankNode): Iterable[PennTreebankNode] = {
+      val successors = ArrayBuffer[PennTreebankNode]()
+      successors ++= n.childrenNodes
+      successors
+    }
+    try {
+      SimpleSearcher.depthFirstSearch(this, isGoal, succ)
+    }
+    catch {
+      case e: GoalNotFoundException ⇒ null
+    }
+  }
+
+  /**
+   * Finds the lowest common ancestor (LCA) of this node and another node.
+   * @param that The node to be found LCA together with.
+   * @return The lowest common acnestor of this node and `that` node in the tree.
+   */
+  def lowestCommonAncestor(that: PennTreebankNode): PennTreebankNode = {
+    val myAncestors = this.ancestors.toSet
+    val otherAncestors = that.ancestors.toSet
+    if (myAncestors.isEmpty) return this
+    else if (myAncestors.isEmpty) return that
+    else {
+      val intersect = myAncestors intersect otherAncestors
+      intersect.maxBy(_.depth)
+    }
+  }
+
+
+  /**
+   * Finds a node that both
+   *   (1) is right adjacent to this node, and
+   *   (2) satisfies the condition.
+   * E.g., an NP that is right adjacent to this node.
+   * @param condition
+   * @return
+   */
+  def rightAdjacentNode(condition: PennTreebankNode ⇒ Boolean): PennTreebankNode = {
     val nextWordNodeOfThisNode = this.nextWordNode
     if (nextWordNodeOfThisNode == null) return null
     // go up
@@ -316,7 +372,15 @@ class PennTreebankNode private(var depth: Int,
     null // no adjacent node that meets the condition is found
   }
 
-  def isLeftAdjacentTo(condition: PennTreebankNode ⇒ Boolean): PennTreebankNode = {
+  /**
+   * Finds a node that both
+   *   (1) is left adjacent to this node, and
+   *   (2) satisfies the condition.
+   * E.g., an NP that is left adjacent to this node.
+   * @param condition
+   * @return
+   */
+  def leftAdjacentNode(condition: PennTreebankNode ⇒ Boolean): PennTreebankNode = {
     val prevWordNodeOfThisNode = this.prevWordNode
     if (prevWordNodeOfThisNode == null) return null
     // go up
@@ -335,15 +399,23 @@ class PennTreebankNode private(var depth: Int,
     null // no adjacent node that meets the condition is found
   }
 
+  /**
+   * Test if the node lies before (not necessarily immediately before) that node.
+   * @param that
+   * @return
+   */
   def isBefore(that: PennTreebankNode): Boolean = {
     val thisFirstWordNodeIdx = this.firstWordNode.wordIndex
     val thatFirstWordNodeIdx = that.firstWordNode.wordIndex
     thisFirstWordNodeIdx < thatFirstWordNodeIdx
   }
 
-  def isPassive: Boolean = GerberPassiveVerbFinder.isPassive(this)
-
-
+  /**
+   * Finds the path to the node that makes the given predicate true.
+   * The path is a string of the form: `"NNP↑NP↑S↓VP↓VP↓VB"`.
+   * @param isGoal
+   * @return
+   */
   def pathTo(isGoal: PennTreebankNode => Boolean): String = {
 
     def successorFunc(searchNode: SearchNode[PennTreebankNode, String]): Iterable[SearchNode[PennTreebankNode, String]] = {
@@ -356,8 +428,10 @@ class PennTreebankNode private(var depth: Int,
 
     val result = Searcher.breadthFirstSearch(this, isGoal, successorFunc, "0")
     if (result.size <= 1) return null
-    result.map(r ⇒ r.action + r.state.syntacticCategory).mkString("").substring(1)
+    result.map(r ⇒ r.action + r.state.syntacticCategoryOrPosTag).mkString("").substring(1)
   }
+
+  //endregion
 }
 
 object PennTreebankNode {
@@ -392,17 +466,17 @@ object PennTreebankNode {
    */
   def apply(depth: Int,
             content: String,
-            referenceId: Int,
+            coindex: Int,
             mapId: Int,
             functionalTags: Seq[String],
             parentNode: PennTreebankNode,
             childrenNodes: mutable.ArrayBuffer[PennTreebankNode]) = {
 
     if (childrenNodes == null) {
-      new PennTreebankNode(depth, content, referenceId, mapId, functionalTags, parentNode, new ArrayBuffer[PennTreebankNode])
+      new PennTreebankNode(content, depth, parentNode, new ArrayBuffer[PennTreebankNode], coindex, mapId, functionalTags)
     }
     else {
-      new PennTreebankNode(depth, content, referenceId, mapId, functionalTags, parentNode, childrenNodes)
+      new PennTreebankNode(content, depth, parentNode, childrenNodes, coindex, mapId, functionalTags)
     }
 
   }
