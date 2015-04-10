@@ -121,6 +121,12 @@ class PennTreebankNode private(
     this.traverse().map(x ⇒ x.asInstanceOf[PennTreebankNode])
   }
 
+  /**
+   * All constituent nodes (i.e., internal nodes in the tree).
+   * @return
+   */
+  def constituentNodes = this.internalNodes.map(n ⇒ n.asInstanceOf[PennTreebankNode])
+
   /** All leave nodes subsumed by this node.
     * Different from the inherited `leaves` method in that this method returns an iterable of
     * [[nlpstudio.resources.penntreebank.PennTreebankNode PennTreebankNode]]'s, while the `leaves`

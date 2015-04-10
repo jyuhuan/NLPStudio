@@ -3,9 +3,10 @@ package nlpstudio.resources.nombank
 import java.io.PrintWriter
 
 import nlpstudio.io.files.TextFile
-import nlpstudio.resources.penntreebank.{PennTreebank, PennTreebankEntry, PennTreebankNode}
+import nlpstudio.resources.penntreebank.{SpecialCategories, PennTreebank, PennTreebankEntry, PennTreebankNode}
 
 import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable
 
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 3/11/15.
@@ -187,6 +188,44 @@ object NomBank {
       e.annotations.flatMap(a ⇒ a.nodes.map(n ⇒ {
         NomBankFineGrainedEntry(e.sectionId, e.mrgFileId, e.treeId, e.predicateNode, e.stemmedPredicate, e.senseId, n, supportVerbNodes, a.label, a.functionTags, e.parseTree)
       }))})
+  }
+
+
+  def selectCandidates(parseTree: PennTreebankNode, predicateNode: PennTreebankNode, supportVerbNodes: Seq[PennTreebankNode]): mutable.Set[PennTreebankNode] = {
+    val result = mutable.Set[PennTreebankNode]()
+    val eligibleNodes = parseTree.allNodes.filterNot(n ⇒ n == predicateNode || SpecialCategories.posWithNoRealMeaning.contains(n.syntacticCategoryOrPosTag) || predicateNode.ancestors.contains(n) || supportVerbNodes.contains(n))
+    for (n ← eligibleNodes) result.add(n)
+    result
+  }
+
+  def loadEntriesForTraining(pathToNomBank: String, pathToPennTreebank: String): ArrayBuffer[NomBankFineGrainedEntry] = {
+    val trainingEntries = ArrayBuffer[NomBankFineGrainedEntry]()
+    val coarseEntries = load(pathToNomBank, pathToPennTreebank)
+
+    for (e ← coarseEntries) {
+      val predicateNode = e.predicateNode
+      val parseTree = e.parseTree
+
+      // One NomBank entry may mark multiple support verbs (in version 1.0, at most 2)
+      val supportVerbNodes = ArrayBuffer[PennTreebankNode]()
+      supportVerbNodes ++= e.annotations.filter(a ⇒ a.label == "Support").map(a ⇒ a.nodes.head)
+
+      val allCandidateNodes = selectCandidates(parseTree.tree, predicateNode, supportVerbNodes)
+
+      // All positive training entries
+      trainingEntries ++= e.annotations.flatMap(a ⇒ a.nodes.map(n ⇒ {
+        allCandidateNodes.remove(n)
+        NomBankFineGrainedEntry(e.sectionId, e.mrgFileId, e.treeId, predicateNode, e.stemmedPredicate, e.senseId, n, supportVerbNodes, a.label, a.functionTags, e.parseTree)
+      }))
+
+      // Negative training entries
+      trainingEntries ++= allCandidateNodes.map(n ⇒
+        NomBankFineGrainedEntry(e.sectionId, e.mrgFileId, e.treeId, predicateNode, e.stemmedPredicate, e.senseId, n, supportVerbNodes, "NULL", Seq[String](), parseTree)
+      )
+
+    }
+
+    trainingEntries
   }
 
 

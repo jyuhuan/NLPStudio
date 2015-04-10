@@ -10,6 +10,8 @@ class PennTreebankEntry private(var corpusName: String,
                         var tree: PennTreebankNode) {
 
   def wordNodes = tree.wordNodes
+  def constituentNodes = tree.constituentNodes
+  override def toString = tree.words.mkString(" ")
 }
 
 object PennTreebankEntry {
