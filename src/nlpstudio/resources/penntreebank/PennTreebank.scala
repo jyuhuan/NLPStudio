@@ -10,6 +10,15 @@ import scala.collection.mutable.ArrayBuffer
  * Created by yuhuan on 3/17/15.
  */
 
+/**
+ * A Penn Treebank reader.
+ * Important notice: Since the section 00 does not have wsj_0000.mrg (it starts with
+ * wsj_0001.mrg, which is very very very very annoying!!!), you should create a fake
+ * wsj_0000.mrg under wsj/00/. And since this file is to be parsed by this library,
+ * you should put at least one bracket-style parse tree in it. A simple way to do this,
+ * is to make a copy of any wsj_????.mrg file that's already in wsj/00/, and rename it
+ * to wsj_0000.mrg.
+ */
 object PennTreebank {
   /**
    * Extracts fields from the labels that appear immediately after the left parentheses.
@@ -51,6 +60,7 @@ object PennTreebank {
   /**
    * Extracts fields from the labels that appear immediately before the right parentheses.
    * The input string can take the following form:
+   * @param s A string of the following form:
    * <ul>
    *   <li> hello </li>
    *   <li> *-3 </li>
@@ -58,7 +68,6 @@ object PennTreebank {
    *   <li> *ICH*-2 </li>
    *   <li> *U* </li>
    * </ul>
-   * @param s
    * @return A pair, (word, coIndex)
    */
   def wordSplitter(s: String): (String, Int) = {
@@ -150,7 +159,6 @@ object PennTreebank {
 
   /**
    * Reads all sentences from a *.mrg file.
-   * @param path A path to a *.mrg file.
    * @return A collection of PennTreebankEntry, each representing a parsed sentence.
    */
   def parseMrgFile(corpusName: String, sectionId: Int, mrgFileId: Int, lines: TraversableOnce[String]): Array[PennTreebankEntry] = {
