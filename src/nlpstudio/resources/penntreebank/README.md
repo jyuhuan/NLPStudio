@@ -128,3 +128,6 @@ A convenient method is exposed for users to split the PTB by sections, in a conv
 
 ### Limitations
 Currently, the PTB module in this project is only tested with the wsj part. 
+
+The indexs that maps gapping can only have 1 digit. 
+
