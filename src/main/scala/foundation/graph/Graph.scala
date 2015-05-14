@@ -1,4 +1,4 @@
-package foundation.math.graph
+package foundation.graph
 
 import scala.collection._
 
@@ -48,3 +48,11 @@ class Graph[TVertex, TEdge] {
 
 }
 
+object Graph {
+  def fromTree[V](root: Node[V]) = {
+    val newGraph = new Graph[V, String]()
+    root.traverse(n ⇒ {
+      if (n.parent != null) newGraph.addDirectedEdge(n.parent.data, "", n.data)
+    })
+  }
+}

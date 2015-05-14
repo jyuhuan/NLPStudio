@@ -1,4 +1,4 @@
-package foundation.math.graph
+package foundation.graph
 
 import scala.collection.mutable
 
@@ -7,8 +7,6 @@ import scala.collection.mutable
  */
 /**
  * An n-ary node. Provides a depth first iterator.
- * @param data
- * @tparam T
  */
 
 trait Node[T] {
