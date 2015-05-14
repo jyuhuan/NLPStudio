@@ -96,21 +96,11 @@ object CollinsHeadFinder extends HeadFinder {
     }
 
     // If <constituent, CC, head>, then constituent should be the head.
-    try {
-      val nodeIndex = head.siblingIndex
+    val nodeIndex = head.siblingIndex
 
-      if (nodeIndex >= 2 && node.childrenNodes(nodeIndex - 1).syntacticCategoryOrPosTag == "CC")
-        head = node.childrenNodes(nodeIndex - 2)
+    if (nodeIndex >= 2 && node.childrenNodes(nodeIndex - 1).syntacticCategoryOrPosTag == "CC")
+      head = node.childrenNodes(nodeIndex - 2)
 
-    }
-    catch {
-      case e: NullPointerException ⇒ {
-        val bp = 0
-      }
-      case _ ⇒ {
-        val bp2 = 0
-      }
-    }
 
     return head
   }

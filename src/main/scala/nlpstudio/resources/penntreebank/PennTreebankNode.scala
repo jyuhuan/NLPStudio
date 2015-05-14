@@ -2,7 +2,7 @@ package nlpstudio.resources.penntreebank
 
 
 import foundation.exceptions.GoalNotFoundException
-import foundation.math.graph.Node
+import foundation.graph.Node
 import foundation.problems.search.{SimpleSearcher, SearchNode, Searcher}
 import nlpstudio.exceptions.{NotAWordNodeException, NoMoreWordsException, LowestCommonAncestorNotExistsException}
 import nlpstudio.tools.headfinders.{NullElementHasNoHeadException, GerberSemanticHeadFinder, CollinsHeadFinder}
@@ -460,13 +460,13 @@ object PennTreebankNode {
    * @param functionalTags Functional tags. E.g., `["BNF", "SBJ", "LOC"]`, ...
    *
    * @param parentNode The parent PennTreebankNode. This is different from the `parent` property
-   *                   inherited from the trait [[foundation.math.graph.Node Node]]. That `parent`
+   *                   inherited from the trait [[foundation.graph.Node Node]]. That `parent`
    *                   returns a `Node[String]` object, while `parentNode` is directly a
    *                   [[nlpstudio.resources.penntreebank.PennTreebankNode PennTreebankNode]] object,
    *                   saving the effort to do downward type casting.
    *
    * @param childrenNodes The children of this node. This is different from the `children` property
-   *                   inherited from the trait [[foundation.math.graph.Node Node]]. That `children`
+   *                   inherited from the trait [[foundation.graph.Node Node]]. That `children`
    *                   returns an immutable array of `Node[String]` objects, while this `childrenNodes`
    *                   is directly a mutable array of
    *                   [[nlpstudio.resources.penntreebank.PennTreebankNode PennTreebankNode]] objects,

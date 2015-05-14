@@ -1,6 +1,6 @@
 package nlpstudio.resources.nombank
 
-import foundation.math.graph._
+import foundation.graph._
 import nlpstudio.resources.penntreebank.{PennTreebankNode, PennTreebankEntry}
 
 import scala.StringBuilder

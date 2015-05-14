@@ -5,7 +5,7 @@ import javax.swing.JFrame
 import com.mxgraph.layout.mxCompactTreeLayout
 import com.mxgraph.swing.mxGraphComponent
 import com.mxgraph.view.mxGraph
-import foundation.math.graph.Graph
+import foundation.graph.Graph
 
 import scala.collection.mutable
 
