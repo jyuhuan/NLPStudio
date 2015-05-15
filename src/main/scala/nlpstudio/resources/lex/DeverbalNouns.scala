@@ -1,4 +1,4 @@
-package nlpstudio.resources.Lexica
+package nlpstudio.resources.lex
 
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 5/2/15.
