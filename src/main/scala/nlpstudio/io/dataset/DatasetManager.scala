@@ -19,6 +19,13 @@ object DatasetManager {
   // 1. Add a method XYZPath
   // 2. Add a method XYZ that calls the load method of 0, i.e., return load(XYZPath)
 
+  def SemEval2010Task8Path = {
+    if (corpusDirs contains "SemEval2010Task8") corpusDirs("SemEval2010Task8").path
+    else throw new DatasetNotInstalledException("SemEval2010Task8 is not installed!")
+  }
+
+  def SemEval2010Task8 = nlpstudio.resources.semeval.year2010.task8.SemEval2010Task8.load(SemEval2010Task8Path)
+
   def MpqaPath = {
     if (corpusDirs contains "MPQA") corpusDirs("MPQA").path
     else throw new DatasetNotInstalledException("MPQA is not installed!")
