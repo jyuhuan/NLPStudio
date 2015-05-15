@@ -1,6 +1,5 @@
 package nlpstudio.io.dataset
 
-import nlpstudio.core.Dataset
 import nlpstudio.exceptions.DatasetNotInstalledException
 import nlpstudio.resources.penntreebank.PennTreebank
 
@@ -14,6 +13,18 @@ object DatasetManager {
 
   val corpusDirs = mutable.HashMap[String, Dataset]()
   load("/Users/yuhuan/work/data/NLPStudio/Config.xml")
+
+  // How to add a new dataset named XYZ:
+  // 0. Add a class in nlpstudio.resource.xyz that handles reading the corpus, and provides a method load(path: String)
+  // 1. Add a method XYZPath
+  // 2. Add a method XYZ that calls the load method of 0, i.e., return load(XYZPath)
+
+  def MpqaPath = {
+    if (corpusDirs contains "MPQA") corpusDirs("MPQA").path
+    else throw new DatasetNotInstalledException("MPQA is not installed!")
+  }
+
+  def Mpqa = nlpstudio.resources.mpqa.Mpqa.load(MpqaPath)
 
   def NomBankPath = {
     if (corpusDirs contains "NomBank") corpusDirs("NomBank").path
