@@ -1,4 +1,4 @@
-package learning.core
+package nlpstudio.core
 
 import learning.exceptions.NoSuchKeyException
 
@@ -19,14 +19,14 @@ class Codebook {
   def apply(value: String): Int = {
     if (valueToIndex contains value) valueToIndex(value)
     else {
-      if (isFrozen) 0
+      if (isFrozen) Codebook.unknownIndex
       else add(value)
     }
   }
 
   def apply(index: Int): String = {
-    if (indexToValue contains index) indexToValue(index)
-    else throw new NoSuchKeyException("The key " + index.toString + " does not exist!")
+    if (indexToValue contains index) indexToValue(index) else Codebook.unknownWord
+    //else throw new NoSuchKeyException("The key " + index.toString + " does not exist!")
   }
 
   private def add(value: String): Int = {
@@ -36,5 +36,13 @@ class Codebook {
     indexToValue += newIdx → value
     newIdx
   }
+}
 
+object Codebook {
+  val unknownIndex = 0
+  val unknownWord = "UNK"
+}
+
+object ImplicitCodebooks {
+  implicit val vocabularyCodebook = new Codebook()
 }

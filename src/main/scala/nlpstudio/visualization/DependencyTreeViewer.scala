@@ -1,4 +1,6 @@
 package nlpstudio.visualization
+import nlpstudio.core.ImplicitCodebooks.vocabularyCodebook
+
 
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 2/7/15.

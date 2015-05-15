@@ -4,9 +4,9 @@ package nlpstudio.resources.penntreebank
 import foundation.exceptions.GoalNotFoundException
 import foundation.graph.Node
 import foundation.problems.search.{SimpleSearcher, SearchNode, Searcher}
+import nlpstudio.core.Rule
 import nlpstudio.exceptions.{NotAWordNodeException, NoMoreWordsException, LowestCommonAncestorNotExistsException}
 import nlpstudio.tools.headfinders.{NullElementHasNoHeadException, GerberSemanticHeadFinder, CollinsHeadFinder}
-import nlpstudio.resources.core.Rule
 import nlpstudio.tools.verbfinders.GerberPassiveVerbFinder
 
 
