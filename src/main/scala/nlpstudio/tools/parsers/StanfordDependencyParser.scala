@@ -27,10 +27,10 @@ class StanfordDependencyParser(implicit codebook: Codebook) {
     val parse = new DependencyParse()
     for (typedDependency <- gs.allTypedDependencies()) {
       //val govWord1 = typedDependency.gov().word()
-      val govWord = new core.Word(typedDependency.gov().word())
+      val govWord = codebook(typedDependency.gov().word())
       val govWordIndex = typedDependency.gov().index()
       //val depWord = typedDependency.dep().word()
-      val depWord = new core.Word(typedDependency.dep().word())
+      val depWord = codebook(typedDependency.dep().word())
       val depWordIndex = typedDependency.dep().index()
       val relation = typedDependency.reln().toString
       //dependencyParse.addDirectedEdge("[" + govWordIndex + "] " + govWord, relation, "[" + depWordIndex + "] " + depWord)
