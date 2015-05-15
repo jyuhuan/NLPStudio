@@ -1,4 +1,4 @@
-package nlpstudio.resources.core
+package nlpstudio.core
 
 /**
  * Created by yuhuan on 3/21/15.
