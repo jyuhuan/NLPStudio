@@ -6,6 +6,8 @@ import nlpstudio.core.Word
 import scala.collection.JavaConversions._
 import edu.stanford.nlp.process.DocumentPreprocessor
 
+import nlpstudio.core.ImplicitCodebooks._
+
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 5/15/15.
  */
