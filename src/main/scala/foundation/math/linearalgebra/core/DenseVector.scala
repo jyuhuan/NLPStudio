@@ -16,10 +16,12 @@ class DenseVector(val data: Array[Double]) {
     new DenseVector(newData)
   }
   def +(that: DenseVector): DenseVector = add(that)
+
+  override def toString: String = "(" + data.mkString(", ") + ")"
 }
 
 object DenseVector {
   def apply(array: Array[Double]): DenseVector = ofArray(array)
-  def ofDim(dimension: Int): DenseVector = new DenseVector(Array.ofDim[Double](dimension))
+  def zeroes(dimension: Int): DenseVector = new DenseVector(Array.ofDim[Double](dimension))
   def ofArray(array: Array[Double]): DenseVector = new DenseVector(array)
 }
