@@ -179,8 +179,11 @@ class Word2Vec {
     * @param word Word to retrieve vector for.
     * @return The vector representation of the word.
     */
-  def vector(word: String): Array[Float] = {
-    vocab.getOrElse(word, Array.ofDim[Float](vecSize))
+  def vector(word: String): Array[Double] = {
+    val resultInFloat = vocab.getOrElse(word, Array.ofDim[Float](vecSize))
+    val resultInDouble = Array.ofDim[Double](vecSize)
+    for (i ← 0 until vecSize) resultInDouble(i) = resultInFloat(i)
+    resultInDouble
   }
 
   /** Compute the Euclidean distance between two vectors.
