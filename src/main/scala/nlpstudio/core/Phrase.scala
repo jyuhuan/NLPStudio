@@ -22,7 +22,9 @@ class Phrase(val words: Iterable[Int])(implicit cb: Codebook) extends Iterable[I
 
 object Phrase {
   def apply(phraseString: String)(implicit cb: Codebook): Phrase = {
-    val words = StanfordTokenizer.tokenize(phraseString)
+    val words = phraseString.split(' ').map(x ⇒ cb(x))
     new Phrase(words)
   }
+
+  def apply(words: Iterable[Int])(implicit cb: Codebook): Phrase = new Phrase(words)
 }

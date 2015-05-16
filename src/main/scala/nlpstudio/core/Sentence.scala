@@ -9,7 +9,9 @@ class Sentence(words: Iterable[Int])(implicit cb: Codebook) extends Phrase(words
 
 object Sentence {
   def apply(sentenceString: String)(implicit cb: Codebook): Sentence = {
-    val words = StanfordTokenizer.tokenize(sentenceString)
+    val words = sentenceString.split(' ').map(x ⇒ cb(x))
     new Sentence(words)
   }
+
+  def apply(words: Iterable[Int])(implicit cb: Codebook) = new Sentence(words)
 }
