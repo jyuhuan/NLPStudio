@@ -1,5 +1,4 @@
 package nlpstudio.visualization
-import nlpstudio.core.ImplicitCodebooks.vocabularyCodebook
 
 
 /**

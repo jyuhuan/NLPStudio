@@ -6,7 +6,6 @@ import nlpstudio.resources.penntreebank.PennTreebank
 import scala.collection.mutable
 import scala.xml.XML
 
-import nlpstudio.core.ImplicitCodebooks.vocabularyCodebook
 
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 5/1/15.

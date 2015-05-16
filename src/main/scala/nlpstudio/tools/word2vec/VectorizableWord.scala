@@ -6,16 +6,16 @@ import nlpstudio.core._
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 5/16/15.
  */
-class VectorizableWord(word: Int)(implicit cb: Codebook) {
+class VectorizableWord(word: Int) {
   def vectorize: DenseVector = vectorizer.vectorOf(word)
 }
 
-class VectorizablePhrase(phrase: Phrase)(implicit cb: Codebook) {
+class VectorizablePhrase(phrase: Phrase) {
   def vectorize: DenseVector = vectorizer.vectorOf(phrase)
 }
 
 object Vectorizables {
-  implicit def wordIsVectorizable(word: Int)(implicit cb: Codebook): VectorizableWord = new VectorizableWord(word)
-  implicit def phraseIsVectorizable(phrase: Phrase)(implicit cb: Codebook): VectorizablePhrase = new VectorizablePhrase(phrase)
+  implicit def wordIsVectorizable(word: Int): VectorizableWord = new VectorizableWord(word)
+  implicit def phraseIsVectorizable(phrase: Phrase): VectorizablePhrase = new VectorizablePhrase(phrase)
 }
 

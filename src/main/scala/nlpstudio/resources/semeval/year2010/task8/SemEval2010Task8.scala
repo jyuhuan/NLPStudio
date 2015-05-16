@@ -8,6 +8,7 @@ import nlpstudio.io.files.TextFile
 import nlpstudio.tools.tokenizers.StanfordTokenizer
 
 import scala.collection.mutable.ArrayBuffer
+import nlpstudio.core.GlobalCodebooks._
 
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 5/15/15.
@@ -19,7 +20,7 @@ object SemEval2010Task8 {
   private val regexE2 = regexE2String r
   private val regexRel = """[\(\),]"""
 
-  def load(path: String)(implicit cb: Codebook): Array[SemEval2010Task8Entry] = {
+  def load(path: String): Array[SemEval2010Task8Entry] = {
     val trainFilePath = path + File.separator + "SemEval2010_task8_training/TRAIN_FILE.TXT"
 
     val lines = TextFile.readLines(trainFilePath)

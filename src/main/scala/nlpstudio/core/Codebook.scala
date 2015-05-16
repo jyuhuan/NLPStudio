@@ -43,6 +43,6 @@ object Codebook {
   val unknownWord = "UNK"
 }
 
-object ImplicitCodebooks {
-  implicit val vocabularyCodebook = new Codebook()
+object GlobalCodebooks {
+  val cb = new Codebook()
 }

@@ -1,11 +1,11 @@
 package nlpstudio.core
 
-import nlpstudio.tools.tokenizers.StanfordTokenizer
+import nlpstudio.core.GlobalCodebooks._
 
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 5/15/15.
  */
-class Phrase(val words: Iterable[Int])(implicit cb: Codebook) extends Iterable[Int] {
+class Phrase(val words: Iterable[Int]) extends Iterable[Int] {
   override def iterator: Iterator[Int] = words.iterator
 
   override def equals(that: Any): Boolean = {
@@ -21,10 +21,10 @@ class Phrase(val words: Iterable[Int])(implicit cb: Codebook) extends Iterable[I
 }
 
 object Phrase {
-  def apply(phraseString: String)(implicit cb: Codebook): Phrase = {
+  def apply(phraseString: String): Phrase = {
     val words = phraseString.split(' ').map(x ⇒ cb(x))
     new Phrase(words)
   }
 
-  def apply(words: Iterable[Int])(implicit cb: Codebook): Phrase = new Phrase(words)
+  def apply(words: Iterable[Int]): Phrase = new Phrase(words)
 }

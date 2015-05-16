@@ -7,6 +7,7 @@ import java.net.URL
 import edu.mit.jwi.Dictionary
 import edu.mit.jwi.item._
 import nlpstudio.core._
+import nlpstudio.core.GlobalCodebooks._
 
 
 /**
@@ -27,7 +28,7 @@ class WordNet(wordNetHome: String) {
     else null
   }
 
-  def hypernymsOf(word: Int, partOfSpeech: WordNetPartOfSpeech)(implicit cb: Codebook): Array[Phrase] = {
+  def hypernymsOf(word: Int, partOfSpeech: WordNetPartOfSpeech): Array[Phrase] = {
     val wordnetPos = pos2pos(partOfSpeech)
 
     val indexWord = dict.getIndexWord(cb(word), wordnetPos)
@@ -43,7 +44,7 @@ class WordNet(wordNetHome: String) {
     })).toArray
   }
 
-  def hyponymsOf(word: Int, partOfSpeech: WordNetPartOfSpeech)(implicit cb: Codebook): Array[Phrase] = {
+  def hyponymsOf(word: Int, partOfSpeech: WordNetPartOfSpeech): Array[Phrase] = {
     val wordnetPos = pos2pos(partOfSpeech)
 
     val indexWord = dict.getIndexWord(cb(word), wordnetPos)
@@ -59,7 +60,7 @@ class WordNet(wordNetHome: String) {
     })).toArray
   }
 
-  def synonymsOf(word: Int, partOfSpeech: WordNetPartOfSpeech)(implicit cb: Codebook): Array[Phrase] = {
+  def synonymsOf(word: Int, partOfSpeech: WordNetPartOfSpeech): Array[Phrase] = {
     val wordnetPos = pos2pos(partOfSpeech)
 
     val indexWord = dict.getIndexWord(cb(word), wordnetPos)

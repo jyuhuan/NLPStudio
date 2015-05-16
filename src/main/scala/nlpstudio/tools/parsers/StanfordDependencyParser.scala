@@ -13,11 +13,12 @@ import nlpstudio._
 import nlpstudio.core._
 
 import scala.collection.JavaConversions._
+import nlpstudio.core.GlobalCodebooks._
 
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 5/14/15.
  */
-class StanfordDependencyParser(implicit codebook: Codebook) {
+class StanfordDependencyParser {
   val tagger = new MaxentTagger("edu/stanford/nlp/models/pos-tagger/english-left3words/english-left3words-distsim.tagger")
   val parser = DependencyParser.loadFromModelFile(DependencyParser.DEFAULT_MODEL)
 
@@ -27,10 +28,10 @@ class StanfordDependencyParser(implicit codebook: Codebook) {
     val parse = new DependencyParse()
     for (typedDependency <- gs.allTypedDependencies()) {
       //val govWord1 = typedDependency.gov().word()
-      val govWord = codebook(typedDependency.gov().word())
+      val govWord = cb(typedDependency.gov().word())
       val govWordIndex = typedDependency.gov().index() - 1
       //val depWord = typedDependency.dep().word()
-      val depWord = codebook(typedDependency.dep().word())
+      val depWord = cb(typedDependency.dep().word())
       val depWordIndex = typedDependency.dep().index() - 1
       val relation = typedDependency.reln().toString
       //dependencyParse.addDirectedEdge("[" + govWordIndex + "] " + govWord, relation, "[" + depWordIndex + "] " + depWord)

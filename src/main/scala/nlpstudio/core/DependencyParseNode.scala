@@ -1,11 +1,12 @@
 package nlpstudio.core
 
 import foundation.graph.Node
+import nlpstudio.core.GlobalCodebooks._
 
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 5/15/15.
  */
-class DependencyParseNode(val word: Int, val index: Int, parse: DependencyParse)(implicit cb: Codebook) extends Node[Int] {
+class DependencyParseNode(val word: Int, val index: Int, parse: DependencyParse) extends Node[Int] {
   override def data: Int = word
 
   override def children: Seq[Node[Int]] = parse.dependentsOf(this)
