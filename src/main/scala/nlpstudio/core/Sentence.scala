@@ -5,7 +5,9 @@ import nlpstudio.core.GlobalCodebooks._
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 5/15/15.
  */
-class Sentence(words: Iterable[Int]) extends Phrase(words)
+class Sentence(words: Seq[Int]) extends Phrase(words) {
+  def apply(index: Int): Int = words(index)
+}
 
 object Sentence {
   def apply(sentenceString: String): Sentence = {
@@ -13,5 +15,5 @@ object Sentence {
     new Sentence(words)
   }
 
-  def apply(words: Iterable[Int]) = new Sentence(words)
+  def apply(words: Seq[Int]) = new Sentence(words)
 }

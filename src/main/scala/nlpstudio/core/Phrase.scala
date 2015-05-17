@@ -5,7 +5,7 @@ import nlpstudio.core.GlobalCodebooks._
 /**
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 5/15/15.
  */
-class Phrase(val words: Iterable[Int]) extends Iterable[Int] {
+class Phrase(val words: Seq[Int]) extends Iterable[Int] {
   override def iterator: Iterator[Int] = words.iterator
 
   override def equals(that: Any): Boolean = {
@@ -26,5 +26,5 @@ object Phrase {
     new Phrase(words)
   }
 
-  def apply(words: Iterable[Int]): Phrase = new Phrase(words)
+  def apply(words: Seq[Int]): Phrase = new Phrase(words)
 }
