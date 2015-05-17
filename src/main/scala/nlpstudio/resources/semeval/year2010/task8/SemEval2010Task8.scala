@@ -20,10 +20,15 @@ object SemEval2010Task8 {
   private val regexE2 = regexE2String r
   private val regexRel = """[\(\),]"""
 
-  def load(path: String): Array[SemEval2010Task8Entry] = {
-    val trainFilePath = path + File.separator + "SemEval2010_task8_training/TRAIN_FILE.TXT"
 
-    val lines = TextFile.readLines(trainFilePath)
+  def load(dir: String): (Array[SemEval2010Task8Entry], Array[SemEval2010Task8Entry]) = {
+    val trainFilePath = dir + File.separator + "SemEval2010_task8_training/TRAIN_FILE.TXT"
+    val testFilePath = dir + File.separator + "SemEval2010_task8_testing_keys/TEST_FILE_FULL.TXT"
+    (loadFile(trainFilePath), loadFile(testFilePath))
+  }
+
+  private def loadFile(path: String): Array[SemEval2010Task8Entry] = {
+    val lines = TextFile.readLines(path)
     for (lineGroup ← lines grouped 4) yield {
       val sentenceLine = lineGroup(0)
       val relationLine = lineGroup(1)
