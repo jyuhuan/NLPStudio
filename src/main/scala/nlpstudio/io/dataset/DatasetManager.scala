@@ -2,6 +2,7 @@ package nlpstudio.io.dataset
 
 import nlpstudio.exceptions.DatasetNotInstalledException
 import nlpstudio.resources.penntreebank.PennTreebank
+import nlpstudio.resources.semeval.year2010.task8.SemEval2010Task8Entry
 
 import scala.collection.mutable
 import scala.xml.XML
@@ -25,7 +26,8 @@ object DatasetManager {
     else throw new DatasetNotInstalledException("SemEval2010Task8 is not installed!")
   }
 
-  def SemEval2010Task8 = nlpstudio.resources.semeval.year2010.task8.SemEval2010Task8.load(SemEval2010Task8Path)
+  def SemEval2010Task8: (Array[SemEval2010Task8Entry], Array[SemEval2010Task8Entry]) =
+    nlpstudio.resources.semeval.year2010.task8.SemEval2010Task8.load(SemEval2010Task8Path)
 
   def MpqaPath = {
     if (corpusDirs contains "MPQA") corpusDirs("MPQA").path
