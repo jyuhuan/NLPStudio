@@ -29,7 +29,7 @@ object BethardEventRelation {
   def load(dir: String): Array[BethardEventRelationEntry] = {
     val dataXml = XML.loadFile(dir + File.separator + "treebank-verb-conj-anns.xml")
 
-    //val ptb = DatasetManager.PennTreebankWSJPart
+    val ptb = DatasetManager.PennTreebankWSJPart
 
     val annotations = dataXml \\ "link"
 
@@ -50,19 +50,23 @@ object BethardEventRelation {
 
       // Extract event 1
       val e1Info = annotations.head
-      val e1PtbFileName = (e1Info \ "@file").text
-      val (e1SectionID, e1FileId) = parsePtbFileName(e1PtbFileName)
+      val ptbFileName = (e1Info \ "@file").text
+      val (sectionID, fileId) = parsePtbFileName(ptbFileName)
       val e1WordId = (e1Info \ "@leaf").text.toInt
-      val e1SentenceId = (e1Info \ "@sentence").text.toInt
+      val sentenceId = (e1Info \ "@sentence").text.toInt
+
+      // Obtain the parse tree
+      val parseTree = ptb(sectionID)(fileId)(sentenceId)
 
       // Extract event 2
       val e2Info = annotations.last
-      val e2PtbFileName = (e2Info \ "@file").text
-      val (e2SectionID, e2FileId) = parsePtbFileName(e2PtbFileName)
       val e2WordId = (e2Info \ "@leaf").text.toInt
-      val e2SentenceId = (e2Info \ "@sentence").text.toInt
 
-      new BethardEventRelationEntry(id, causalLabel, temporalLabel, e1SectionID, e1FileId, e1SentenceId, e1WordId, e2SectionID, e2FileId, e2SentenceId, e2WordId)
+      // Obtain the parse tree nodes for e1 and e2
+      val e1Node = parseTree.tree.wordNodes(e1WordId)
+      val e2Node = parseTree.tree.wordNodes(e2WordId)
+
+      new BethardEventRelationEntry(id, causalLabel, temporalLabel, parseTree, e1Node, e2Node)
     }
   }.toArray
 }
