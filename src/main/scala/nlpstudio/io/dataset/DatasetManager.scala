@@ -21,12 +21,12 @@ object DatasetManager {
   // 1. Add a method XYZPath
   // 2. Add a method XYZ that calls the load method of 0, i.e., return load(XYZPath)
 
-  def BethardTemporalCausalPath = {
+  def BethardEventRelationPath = {
     if (corpusDirs contains "BethardTemporalCausal") corpusDirs("BethardTemporalCausal").path
     else throw new DatasetNotInstalledException("BethardTemporalCausal is not installed!")
   }
 
-  //??
+  def BethardEventRelation = nlpstudio.resources.bethardeventrel.BethardEventRelation.load(BethardEventRelationPath)
 
 
   def SemEval2010Task8Path = {
