@@ -15,5 +15,7 @@ object Sentence {
     new Sentence(words)
   }
 
+  def ofStringWords(stringWords: Seq[String]): Sentence = new Sentence(stringWords.map(w ⇒ cb(w)))
+
   def apply(words: Seq[Int]) = new Sentence(words)
 }
