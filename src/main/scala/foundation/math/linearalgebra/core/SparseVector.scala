@@ -51,6 +51,17 @@ class SparseVector(var dimension: Int) {
     }
     result.mkString(" ")
   }
+
+  def toMatlabString = {
+    var result = ArrayBuffer[String]()
+    for (e ← this.data.entrySet()) {
+      val value = e.getValue
+      if (value != 0) {
+        result += e.getKey + 1 + ":" + value
+      }
+    }
+    result.mkString(" ")
+  }
 }
 
 object SparseVector {
