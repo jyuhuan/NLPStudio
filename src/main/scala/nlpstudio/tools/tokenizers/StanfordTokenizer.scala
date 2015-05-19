@@ -15,6 +15,6 @@ object StanfordTokenizer {
   def tokenize(sentence: String): Array[Int] = {
     val stringReader = new StringReader(sentence)
     val documentPreprocessor = new DocumentPreprocessor(stringReader)
-    documentPreprocessor.head.map(x ⇒ cb(x.word())).toArray
+    documentPreprocessor.flatten.map(x ⇒ cb(x.word())).toArray
   }
 }

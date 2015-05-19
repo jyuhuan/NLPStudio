@@ -28,7 +28,12 @@ class DependencyParse extends Graph[DependencyParseNode, WordDependency] {
     else graphParents.head._1
   }
 
-  def apply(index: Int): DependencyParseNode = this.nodes(index)
+  def apply(index: Int): DependencyParseNode = {
+    if (!this.nodes.contains(index)) {
+      val b = 0
+    }
+    this.nodes(index)
+  }
 }
 
 object DependencyParse {

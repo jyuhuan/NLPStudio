@@ -75,9 +75,9 @@ object SemEval2010Task8 {
 
       val relationParts = relationLine.split(regexRel)
       val relationName = relationParts(0)
-      val relation = if (relationParts.length <= 1) OrderedRelation[Phrase](e1, "Other", e2)
-      else if (relationParts(1) == "e1") OrderedRelation[Phrase](e1, relationName, e2)
-      else OrderedRelation[Phrase](e2, relationName, e1)
+      val (relation, isReversed) = if (relationParts.length <= 1) (OrderedRelation[Phrase](e1, "Other", e2), false)
+      else if (relationParts(1) == "e1") (OrderedRelation[Phrase](e1, relationName, e2), false)
+      else (OrderedRelation[Phrase](e2, relationName, e1), true)
 
       val sentence = Sentence(tokens)
       SemEval2010Task8Entry(
@@ -87,6 +87,7 @@ object SemEval2010Task8 {
         e1EndPos,
         e2BeginPos,
         e2EndPos,
+        isReversed,
         relation
       )
     }

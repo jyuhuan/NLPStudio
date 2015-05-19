@@ -42,7 +42,7 @@ class StanfordDependencyParser {
 
   def parse(sentence: String): DependencyParse = {
     val docPreprocessor = new DocumentPreprocessor(new StringReader(sentence))
-    val words = docPreprocessor.head
+    val words = docPreprocessor.flatten.toList
     val taggedSentence = tagger.tagSentence(words)
     convert(parseTaggedSentence(taggedSentence))
   }
