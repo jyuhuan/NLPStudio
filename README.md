@@ -1,5 +1,6 @@
 ## NLPStudio
 
+> Code will be refactored from scratch. Do not use in any actual project. 
 
 ## Corpus Management
 Do you hate writing a corpus reader everytime you start an NLP project? 
